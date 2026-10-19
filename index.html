@@ -1,70 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Thesis Literature Review Matrix & Research Dashboard</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Instant Dark Mode Init Script (Prevents FOUC) -->
+  <script>
+    if (localStorage.getItem('thesis_matrix_theme') === 'dark' || 
+        (!('thesis_matrix_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
           colors: {
             brand: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              500: '#0284c7',
-              600: '#0369a1',
-              700: '#075985',
-              800: '#0c4a6e',
-              900: '#082f49'
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+            slate: {
+              750: '#293548',
+              850: '#151e2e',
+              925: '#0b1120',
+              950: '#060a14'
             }
+          },
+          boxShadow: {
+            'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+            'card': '0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04)',
+            'card-hover': '0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04)',
           }
         }
       }
     }
   </script>
+
   <style>
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .dark ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Hide scrollbar utility */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .theme-transition {
+      transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                  border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                  color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen transition-colors duration-200 dark:bg-slate-900 dark:text-slate-100 flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col font-sans theme-transition antialiased selection:bg-brand-500/20 selection:text-brand-700 dark:selection:text-brand-300">
 
   <!-- TOP APP BAR -->
-  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+  <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-30 shadow-subtle theme-transition">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20 shrink-0 transform hover:scale-105 transition-transform duration-200">
           <i class="fa-solid fa-graduation-cap text-lg"></i>
         </div>
-        <div>
-          <h1 class="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            Thesis Literature Matrix
-            <span class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-300 font-semibold border border-sky-200 dark:border-sky-700">v2.5 AI Powered</span>
-          </h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Fandom Dynamics, Misinformation Verification & Platform Moderation</p>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg md:text-xl tracking-tight text-slate-900 dark:text-white truncate">
+              Thesis Literature Matrix
+            </h1>
+            <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300 border border-brand-200/80 dark:border-brand-800 shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+              v3.0 Pro
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 truncate hidden md:block">
+            Fandom Dynamics, Misinformation Verification & Platform Moderation
+          </p>
         </div>
       </div>
 
       <!-- Action buttons -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <button id="openAddModalBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-xs transition">
-          <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Add Paper via DOI
+      <div class="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+        <!-- View Toggle (Table vs Cards) -->
+        <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+          <button id="viewTableBtn" title="Table View" class="px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-300 shadow-xs">
+            <i class="fa-solid fa-table-list"></i>
+            <span class="hidden lg:inline ml-1.5">Table</span>
+          </button>
+          <button id="viewGridBtn" title="Card Grid View" class="px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">
+            <i class="fa-solid fa-grip"></i>
+            <span class="hidden lg:inline ml-1.5">Cards</span>
+          </button>
+        </div>
+
+        <!-- Add Paper via DOI -->
+        <button id="openAddModalBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white shadow-xs shadow-brand-600/20 active:scale-95 transition-all">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1.5 text-xs"></i>
+          <span class="hidden sm:inline">Add Paper via DOI</span>
+          <span class="sm:hidden">Add</span>
         </button>
-        <button id="exportCsvBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 transition">
-          <i class="fa-solid fa-file-excel mr-1.5 text-emerald-600 dark:text-emerald-400"></i>
-          Export CSV
-        </button>
-        <button id="themeToggleBtn" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 focus:outline-none transition">
-          <i class="fa-solid fa-moon dark:hidden"></i>
+
+        <!-- Export Dropdown -->
+        <div class="relative">
+          <button id="exportDropdownBtn" class="inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition active:scale-95">
+            <i class="fa-solid fa-download mr-1.5 text-emerald-600 dark:text-emerald-400"></i>
+            <span class="hidden sm:inline">Export</span>
+            <i class="fa-solid fa-chevron-down ml-1.5 text-[10px]"></i>
+          </button>
+          
+          <div id="exportDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 z-40 text-xs text-slate-700 dark:text-slate-200">
+            <button id="exportCsvBtn" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2">
+              <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 w-4"></i> Export Matrix (CSV)
+            </button>
+            <button id="exportBibtexBtn" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2">
+              <i class="fa-solid fa-file-code text-indigo-600 dark:text-indigo-400 w-4"></i> Export Citations (BibTeX)
+            </button>
+            <button id="exportJsonBtn" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/60 flex items-center gap-2">
+              <i class="fa-solid fa-file-lines text-amber-600 dark:text-amber-400 w-4"></i> Export Backup (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" aria-label="Toggle Theme" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 focus:outline-none transition active:scale-90">
+          <i class="fa-solid fa-moon dark:hidden text-slate-600"></i>
           <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
         </button>
       </div>
@@ -72,111 +165,141 @@
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
 
     <!-- KPI / DASHBOARD SUMMARY SECTION -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total References</p>
-          <div class="flex items-baseline space-x-2 mt-1">
-            <span id="metricTotalPapers" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
-            <span class="text-xs text-slate-500 font-medium">studies cataloged</span>
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-card flex flex-col justify-between">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Cataloged Papers</p>
+            <div class="flex items-baseline space-x-1.5 mt-1 sm:mt-1.5">
+              <span id="metricTotalPapers" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">0</span>
+              <span class="text-[11px] sm:text-xs text-slate-500">studies</span>
+            </div>
           </div>
-          <p class="text-xs text-sky-600 dark:text-sky-400 mt-1"><i class="fa-solid fa-cloud-arrow-down mr-1"></i>Live Google Sheets Sync</p>
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-brand-50 dark:bg-brand-950/70 text-brand-600 dark:text-brand-300 flex items-center justify-center text-base sm:text-lg shrink-0">
+            <i class="fa-solid fa-book-bookmark"></i>
+          </div>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 flex items-center justify-center text-xl">
-          <i class="fa-solid fa-book-bookmark"></i>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+          <span id="syncIndicator" class="text-brand-600 dark:text-brand-400 flex items-center gap-1 truncate font-medium">
+            <i class="fa-solid fa-circle-check text-[10px] text-emerald-500"></i> Local Storage Synced
+          </span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs">
-        <div class="flex items-center justify-between">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Synthesis Rate</p>
-          <span id="metricReadPercent" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">0%</span>
-        </div>
-        <div class="mt-2">
-          <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden flex">
-            <div id="barSynthesized" class="bg-emerald-500 h-2.5 transition-all duration-300" style="width: 0%"></div>
-            <div id="barAnnotated" class="bg-sky-500 h-2.5 transition-all duration-300" style="width: 0%"></div>
-            <div id="barSkimmed" class="bg-amber-400 h-2.5 transition-all duration-300" style="width: 0%"></div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-card flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Synthesis Rate</p>
+            <span id="metricReadPercent" class="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">0%</span>
+          </div>
+          <div class="mt-2.5">
+            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden flex">
+              <div id="barSynthesized" class="bg-emerald-500 h-2.5 transition-all duration-500" title="Synthesized" style="width: 0%"></div>
+              <div id="barAnnotated" class="bg-brand-500 h-2.5 transition-all duration-500" title="Read & Annotated" style="width: 0%"></div>
+              <div id="barSkimmed" class="bg-amber-400 h-2.5 transition-all duration-500" title="Skimmed" style="width: 0%"></div>
+            </div>
           </div>
         </div>
-        <div class="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-          <span id="metricSynthesizedCount">0 Synthesized</span>
-          <span id="metricAnnotatedCount">0 Read</span>
-          <span id="metricUnreadCount">0 Unread</span>
+        <div class="flex justify-between items-center text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <span id="metricSynthesizedCount" class="font-medium text-emerald-600 dark:text-emerald-400">0 Synth</span>
+          <span id="metricAnnotatedCount" class="font-medium text-brand-600 dark:text-brand-400">0 Read</span>
+          <span id="metricUnreadCount" class="font-medium text-slate-400">0 Unread</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Thesis Integration</p>
-          <div class="flex items-baseline space-x-1 mt-1">
-            <span id="metricCitedCount" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
-            <span class="text-slate-400">/ <span id="metricTargetTotal">0</span></span>
-            <span class="text-xs text-slate-500 font-medium ml-1">cited in draft</span>
+      <div class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-card flex flex-col justify-between">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Draft Citation</p>
+            <div class="flex items-baseline space-x-1.5 mt-1 sm:mt-1.5">
+              <span id="metricCitedCount" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">0</span>
+              <span class="text-slate-400 text-xs">/ <span id="metricTargetTotal">0</span></span>
+              <span class="text-[11px] sm:text-xs text-slate-500 ml-1">cited</span>
+            </div>
           </div>
-          <div class="flex items-center space-x-2 text-xs mt-1 text-slate-500 dark:text-slate-400">
-            <span id="metricDraftedCount">0 drafted</span>
-            <span>•</span>
-            <span id="metricNotUsedCount">0 queued</span>
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-purple-50 dark:bg-purple-950/70 text-purple-600 dark:text-purple-300 flex items-center justify-center text-base sm:text-lg shrink-0">
+            <i class="fa-solid fa-pen-nib"></i>
           </div>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 flex items-center justify-center text-xl">
-          <i class="fa-solid fa-pen-nib"></i>
+        <div class="flex items-center space-x-2 text-[11px] mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400">
+          <span id="metricDraftedCount" class="font-medium text-indigo-600 dark:text-indigo-400">0 drafted</span>
+          <span>•</span>
+          <span id="metricNotUsedCount">0 queued</span>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Research Domains</p>
-          <div class="flex items-baseline space-x-2 mt-1">
-            <span class="text-2xl font-bold text-slate-900 dark:text-white">5 Clusters</span>
+      <div class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-card flex flex-col justify-between">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Thematic Clusters</p>
+            <div class="flex items-baseline space-x-1.5 mt-1 sm:mt-1.5">
+              <span class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white">5</span>
+              <span class="text-[11px] sm:text-xs text-slate-500">domains</span>
+            </div>
           </div>
-          <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1"><i class="fa-solid fa-cubes mr-1"></i>Cross-disciplinary alignment</p>
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-300 flex items-center justify-center text-base sm:text-lg shrink-0">
+            <i class="fa-solid fa-diagram-project"></i>
+          </div>
         </div>
-        <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 flex items-center justify-center text-xl">
-          <i class="fa-solid fa-diagram-project"></i>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+          <i class="fa-solid fa-check-double text-[10px]"></i> Multi-methodology covered
         </div>
       </div>
     </section>
 
     <!-- CHAPTER COVERAGE & THEMATIC FILTER BAR -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs space-y-3">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700 pb-3">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Thesis Chapter Mapping:</span>
-        <div class="flex flex-wrap gap-2 text-xs">
-          <button data-filter-chapter="all" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-900 text-white dark:bg-sky-600">All Chapters</button>
-          <button data-filter-chapter="Chapter 1" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 1 Problem</button>
-          <button data-filter-chapter="Chapter 2" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 2 Lit Review</button>
-          <button data-filter-chapter="Chapter 3" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 3 Methodology / System</button>
+    <section class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 shadow-card space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+        <span class="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-bookmark text-brand-500"></i> Chapter Alignment:
+        </span>
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0 text-xs">
+          <button data-filter-chapter="all" class="chapter-btn px-3 py-1 rounded-lg font-medium transition-all whitespace-nowrap bg-slate-900 text-white dark:bg-brand-600 dark:text-white shadow-xs">All Chapters</button>
+          <button data-filter-chapter="Chapter 1" class="chapter-btn px-3 py-1 rounded-lg font-medium transition-all whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">Ch. 1 Problem</button>
+          <button data-filter-chapter="Chapter 2" class="chapter-btn px-3 py-1 rounded-lg font-medium transition-all whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">Ch. 2 Lit Review</button>
+          <button data-filter-chapter="Chapter 3" class="chapter-btn px-3 py-1 rounded-lg font-medium transition-all whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">Ch. 3 System & Method</button>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-1.5 pt-1">
-        <span class="text-xs text-slate-400 mr-1"><i class="fa-solid fa-tags mr-1"></i>Theme:</span>
-        <button data-filter-theme="all" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-200 font-medium">All Themes</button>
-        <button data-filter-theme="K-Pop Fandom & Communities" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">K-Pop Fandom</button>
-        <button data-filter-theme="Misinformation & Verification" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Misinformation</button>
-        <button data-filter-theme="Platform Moderation & Algorithms" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Platform Governance</button>
-        <button data-filter-theme="Information Overload" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Info Overload</button>
-        <button data-filter-theme="Knowledge Sharing & Engagement" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Knowledge Sharing</button>
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+        <span class="text-xs text-slate-400 shrink-0 mr-1 flex items-center gap-1">
+          <i class="fa-solid fa-tags text-[11px]"></i> Theme:
+        </span>
+        <button data-filter-theme="all" class="theme-btn text-xs px-3 py-1 rounded-full bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 font-semibold border border-brand-200 dark:border-brand-800 whitespace-nowrap transition-all">All Themes</button>
+        <button data-filter-theme="K-Pop Fandom & Communities" class="theme-btn text-xs px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 whitespace-nowrap transition-all">K-Pop Fandom</button>
+        <button data-filter-theme="Misinformation & Verification" class="theme-btn text-xs px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 whitespace-nowrap transition-all">Misinformation</button>
+        <button data-filter-theme="Platform Moderation & Algorithms" class="theme-btn text-xs px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 whitespace-nowrap transition-all">Platform Moderation</button>
+        <button data-filter-theme="Information Overload" class="theme-btn text-xs px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 whitespace-nowrap transition-all">Info Overload</button>
+        <button data-filter-theme="Knowledge Sharing & Engagement" class="theme-btn text-xs px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 whitespace-nowrap transition-all">Knowledge Sharing</button>
       </div>
-    </div>
+    </section>
 
     <!-- CONTROLS & SEARCH BAR -->
-    <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
-      <div class="relative w-full md:w-96">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+    <div class="flex flex-col lg:flex-row gap-2.5 sm:gap-3 items-stretch lg:items-center justify-between">
+      <div class="relative flex-1 max-w-xl">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
           <i class="fa-solid fa-magnifying-glass text-xs"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="Search author, title, journal, keywords..." 
-               class="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs">
+        <input type="text" id="searchInput" placeholder="Search author, title, journal, findings, keyword... (Ctrl+K)" 
+               class="w-full pl-9 pr-8 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle transition">
+        <button id="clearSearchBtn" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-circle-xmark text-xs"></i>
+        </button>
       </div>
 
-      <div class="flex flex-wrap w-full md:w-auto items-center gap-2">
-        <select id="filterReadingStatus" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm rounded-lg px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500">
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="sortBySelect" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle">
+          <option value="year-desc">Year (Newest)</option>
+          <option value="year-asc">Year (Oldest)</option>
+          <option value="title-asc">Title (A-Z)</option>
+          <option value="cite-asc">Citation Key</option>
+          <option value="id-asc">ID (Default)</option>
+        </select>
+
+        <select id="filterReadingStatus" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle">
           <option value="all">All Reading Status</option>
           <option value="Unread">Unread</option>
           <option value="Skimmed">Skimmed</option>
@@ -184,7 +307,7 @@
           <option value="Synthesized">Synthesized</option>
         </select>
 
-        <select id="filterCitationStatus" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm rounded-lg px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500">
+        <select id="filterCitationStatus" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle">
           <option value="all">All Citation Status</option>
           <option value="Not Used Yet">Not Used Yet</option>
           <option value="Drafted">Drafted</option>
@@ -192,148 +315,230 @@
           <option value="Archive">Archive</option>
         </select>
 
-        <button id="resetFiltersBtn" class="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-2 py-2 underline">
-          Reset
+        <button id="resetFiltersBtn" class="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 px-2.5 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition font-medium">
+          <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
         </button>
       </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden flex flex-col">
+    <!-- BULK ACTIONS BAR -->
+    <div id="bulkActionBar" class="hidden bg-slate-900 text-white dark:bg-brand-950 dark:text-white px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 dark:border-brand-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-[10px]" id="selectedCountBadge">0</span>
+        <span class="font-semibold"><span id="selectedCountText">0</span> references selected</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button id="bulkMarkReadBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs border border-slate-600 transition">
+          <i class="fa-solid fa-check-double mr-1 text-emerald-400"></i> Mark Read
+        </button>
+        <button id="bulkMarkCitedBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs border border-slate-600 transition">
+          <i class="fa-solid fa-quote-right mr-1 text-indigo-400"></i> Mark Cited
+        </button>
+        <button id="bulkExportCsvBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs border border-slate-600 transition">
+          <i class="fa-solid fa-download mr-1"></i> Export Selected
+        </button>
+        <button id="bulkDeselectBtn" class="px-2 py-1 text-slate-400 hover:text-white underline text-xs">
+          Deselect All
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div id="tableViewContainer" class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-card overflow-hidden flex flex-col transition-all">
       <div class="overflow-x-auto w-full">
-        <table class="w-full text-left border-collapse min-w-[1100px]" id="referencesTable">
+        <table class="w-full text-left border-collapse min-w-[1050px]" id="referencesTable">
           <thead>
-            <tr class="bg-slate-100/80 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 text-[11px] font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-              <th class="py-3 px-3 w-14 text-center">ID</th>
-              <th class="py-3 px-3 w-48">Citation Key & Year</th>
-              <th class="py-3 px-4 min-w-[260px]">Article Title & Publication Details</th>
-              <th class="py-3 px-3 w-40">Theme & Methodology</th>
-              <th class="py-3 px-4 min-w-[240px]">Relevance to Thesis</th>
+            <tr class="bg-slate-50/90 dark:bg-slate-850/90 text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200/80 dark:border-slate-800 select-none">
+              <th class="py-3 px-3 w-10 text-center">
+                <input type="checkbox" id="selectAllCheckbox" class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer">
+              </th>
+              <th class="py-3 px-2 w-16 text-center cursor-pointer hover:text-brand-600" data-sort="id">ID</th>
+              <th class="py-3 px-3 w-48 cursor-pointer hover:text-brand-600" data-sort="cite">Citation Key & Year</th>
+              <th class="py-3 px-4 min-w-[270px] cursor-pointer hover:text-brand-600" data-sort="title">Article Title & Publication Details</th>
+              <th class="py-3 px-3 w-44">Theme & Methodology</th>
+              <th class="py-3 px-4 min-w-[230px]">Relevance to Thesis</th>
               <th class="py-3 px-3 w-28 text-center">Target Ch.</th>
               <th class="py-3 px-3 w-36">Reading Status</th>
               <th class="py-3 px-3 w-36">Citation Status</th>
               <th class="py-3 px-3 w-24 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-xs text-slate-700 dark:text-slate-300">
-            <!-- Rows render dynamically -->
+          <tbody id="tableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs text-slate-700 dark:text-slate-300">
           </tbody>
         </table>
       </div>
 
-      <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
-        <div>
-          Showing <span id="visibleRowCount" class="font-bold text-slate-800 dark:text-slate-200">0</span> references
-        </div>
-        <div id="syncIndicator" class="text-[11px] text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-cloud"></i> Synced with Google Sheets
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ADD REFERENCE MODAL WITH DOI AI AUTO-FILL -->
-  <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-      <!-- Modal Header -->
-      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/80 dark:bg-slate-850">
-        <div>
-          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fa-solid fa-wand-magic-sparkles text-sky-600"></i> Add Literature via DOI Auto-Fill
-          </h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Paste a DOI link to automatically extract metadata and draft thesis insights</p>
-        </div>
-        <button id="closeAddModalBtn" class="text-slate-400 hover:text-slate-600 p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <!-- DOI Auto-Fetcher Input Bar -->
-      <div class="p-4 bg-sky-50/60 dark:bg-sky-950/30 border-b border-sky-100 dark:border-sky-900/40">
-        <label class="block text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300 mb-1.5">
-          1. Paste DOI or DOI Link
-        </label>
-        <div class="flex gap-2">
-          <div class="relative flex-1">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-sky-600 dark:text-sky-400">
-              <i class="fa-solid fa-link text-xs"></i>
-            </div>
-            <input type="text" id="quickDoiInput" placeholder="e.g., https://doi.org/10.1177/01655515221121942 or 10.1177/..." 
-                   class="w-full pl-8 pr-3 py-2 bg-white dark:bg-slate-900 border border-sky-200 dark:border-sky-800 rounded-lg text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
-          </div>
-          <button type="button" id="fetchDoiBtn" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 transition shrink-0 shadow-xs">
-            <span id="fetchBtnText"><i class="fa-solid fa-bolt mr-1"></i>Auto-Fill with AI</span>
-            <i id="fetchSpinner" class="fa-solid fa-spinner fa-spin hidden"></i>
-          </button>
-        </div>
-
-        <!-- Academic Verification Disclaimer Banner -->
-        <div class="mt-2.5 p-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-lg flex items-start gap-2 text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
-          <i class="fa-solid fa-triangle-exclamation text-amber-600 shrink-0 mt-0.5"></i>
-          <span><strong>Academic Integrity Note:</strong> DOI auto-fill fetches verified publication metadata. AI-drafted findings, quotes, and thesis relevance must be reviewed and verified against the actual article text before saving.</span>
-        </div>
-      </div>
-
-      <!-- Main Form (Review & Edit) -->
-      <form id="addRefForm" class="p-4 sm:p-6 overflow-y-auto space-y-3.5 text-xs sm:text-sm flex-1">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Review & Refine Details</span>
-          <span id="autoFillBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
-            <i class="fa-solid fa-check mr-1"></i>Metadata Parsed from CrossRef
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div class="sm:col-span-2">
-            <label class="block text-slate-500 font-semibold mb-1">In-Text Citation Key *</label>
-            <input type="text" id="inputCiteKey" required placeholder="e.g. Apuke et al. (2024)" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-          </div>
-          <div>
-            <label class="block text-slate-500 font-semibold mb-1">Year *</label>
-            <input type="number" id="inputYear" required value="2025" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-slate-500 font-semibold mb-1">Authors *</label>
-          <input type="text" id="inputAuthors" required placeholder="Author 1, Author 2, & Author 3" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-        </div>
-
-        <div>
-          <label class="block text-slate-500 font-semibold mb-1">Article Title *</label>
-          <input type="text" id="inputTitle" required placeholder="Full academic paper title" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-500 font-semibold mb-1">Journal / Publication Venue</label>
-            <input type="text" id="inputVenue" placeholder="e.g. Journal of Information Science" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-          </div>
-          <div>
-            <label class="block text-slate-500 font-semibold mb-1">Volume / Issue / Pages</label>
-            <input type="text" id="inputVolumePages" placeholder="e.g. 50(6), 1371–1381" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-500 font-semibold mb-1">DOI Link</label>
-            <input type="text" id="inputDoi" placeholder="https://doi.org/..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-          </div>
-          <div>
-            <label class="block text-slate-500 font-semibold mb-1">Target Thesis Chapter</label>
-            <select id="inputChapter" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
-              <option value="Chapter 1 (Problem Statement)">Chapter 1 (Problem Statement)</option>
-              <option value="Chapter 2 (Literature Review)" selected>Chapter 2 (Literature Review)</option>
-              <option value="Chapter 3 (System Framework)">Chapter 3 (System Framework)</option>
+      <div class="p-3.5 sm:p-4 bg-slate-50/60 dark:bg-slate-850/40 border-t border-slate-200/80 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span>Showing <span id="visibleRowCount" class="font-bold text-slate-900 dark:text-slate-100">0</span> of <span id="totalRefCount" class="font-bold text-slate-900 dark:text-slate-100">0</span> references</span>
+          <span class="text-slate-300 dark:text-slate-700">|</span>
+          <div class="flex items-center gap-1.5">
+            <span>Per page:</span>
+            <select id="pageSizeSelect" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-0.5 text-xs text-slate-700 dark:text-slate-200">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="all">All</option>
             </select>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div id="paginationControls" class="flex items-center gap-1"></div>
+      </div>
+    </div>
+
+    <!-- CARD GRID VIEW (Alternative for Mobile/Tablet) -->
+    <div id="cardViewContainer" class="hidden space-y-4">
+      <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+        <span>Showing <span id="cardsVisibleCount" class="font-bold text-slate-900 dark:text-slate-100">0</span> items</span>
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-brand-600 hover:underline">
+          <i class="fa-solid fa-arrow-up mr-1"></i> Back to top
+        </button>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE CONTAINER -->
+    <div id="emptyState" class="hidden py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-card">
+      <div class="w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/80 text-brand-500 mx-auto flex items-center justify-center text-2xl mb-3">
+        <i class="fa-solid fa-folder-open"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">No Matching Literature Found</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
+        Try adjusting your search keywords or clear filters to view studies.
+      </p>
+      <button onclick="document.getElementById('resetFiltersBtn').click()" class="mt-4 px-4 py-2 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-300 font-semibold text-xs border border-brand-200 dark:border-brand-800">
+        Reset All Filters
+      </button>
+    </div>
+
+    <!-- QUICK UTILITIES FOOTER -->
+    <div class="flex flex-wrap items-center justify-between text-xs text-slate-400 dark:text-slate-500 pt-2 pb-6 px-1 border-t border-slate-200/60 dark:border-slate-800/60 gap-2">
+      <div class="flex items-center gap-3">
+        <span>Thesis Matrix v3.0</span>
+        <span>•</span>
+        <button id="restoreDefaultDatasetBtn" class="hover:text-brand-600 dark:hover:text-brand-400 transition underline">
+          Restore Initial 25 Papers
+        </button>
+        <span>•</span>
+        <button id="forceSyncCloudBtn" class="hover:text-brand-600 dark:hover:text-brand-400 transition underline">
+          Force Cloud Re-sync
+        </button>
+      </div>
+      <div>
+        <span>Built with Tailwind CSS & CrossRef Academic Metadata API</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT REFERENCE MODAL WITH DOI AI AUTO-FILL -->
+  <div id="addModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-all">
+    <div class="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      
+      <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-850">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 text-white flex items-center justify-center shadow-xs">
+            <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+          </div>
           <div>
-            <label class="block text-slate-500 font-semibold mb-1">Thematic Domain</label>
-            <select id="inputDomain" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+            <h3 id="addModalTitle" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+              Add Literature via DOI Auto-Fill
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Extracts verified CrossRef metadata and drafts thesis relevance</p>
+          </div>
+        </div>
+        <button id="closeAddModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 bg-brand-50/60 dark:bg-brand-950/30 border-b border-brand-100 dark:border-brand-900/40">
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-brand-800 dark:text-brand-300 mb-1.5">
+          Step 1: Paste DOI or URL for Instant Extraction
+        </label>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-600 dark:text-brand-400">
+              <i class="fa-solid fa-link text-xs"></i>
+            </div>
+            <input type="text" id="quickDoiInput" placeholder="e.g. 10.1177/01655515221121942 or https://doi.org/..." 
+                   class="w-full pl-8 pr-3 py-2 bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <button type="button" id="fetchDoiBtn" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 transition shrink-0 shadow-xs active:scale-95">
+            <span id="fetchBtnText"><i class="fa-solid fa-bolt mr-1"></i>Fetch DOI</span>
+            <i id="fetchSpinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+          </button>
+        </div>
+
+        <div class="mt-2.5 p-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/50 rounded-xl flex items-start gap-2 text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"></i>
+          <span><strong>Academic Integrity Protocol:</strong> Metadata is parsed live from CrossRef & Semantic Scholar. Auto-drafted findings, claims, and relevance must be critically validated against full-text articles before saving.</span>
+        </div>
+      </div>
+
+      <form id="addRefForm" class="p-4 sm:p-6 overflow-y-auto space-y-3.5 text-xs sm:text-sm flex-1">
+        <input type="hidden" id="editPaperId" value="">
+        
+        <div class="flex items-center justify-between pb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Step 2: Review & Refine Literature Details</span>
+          <span id="autoFillBadge" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+            <i class="fa-solid fa-check mr-1"></i>Metadata Extracted
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="sm:col-span-2">
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">In-Text Citation Key *</label>
+            <input type="text" id="inputCiteKey" required placeholder="e.g. Apuke et al. (2024)" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Year *</label>
+            <input type="number" id="inputYear" required value="2025" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Authors *</label>
+          <input type="text" id="inputAuthors" required placeholder="Author 1, Author 2, & Author 3" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Article Title *</label>
+          <input type="text" id="inputTitle" required placeholder="Full academic paper title" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Journal / Publication Venue</label>
+            <input type="text" id="inputVenue" placeholder="e.g. Journal of Information Science" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Volume / Issue / Pages</label>
+            <input type="text" id="inputVolumePages" placeholder="e.g. 50(6), 1371–1381" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">DOI Link</label>
+            <input type="text" id="inputDoi" placeholder="https://doi.org/..." class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Target Thesis Chapter</label>
+            <select id="inputChapter" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+              <option value="Chapter 1 (Problem Statement)">Chapter 1 (Problem Statement)</option>
+              <option value="Chapter 2 (Literature Review)" selected>Chapter 2 (Literature Review)</option>
+              <option value="Chapter 3 (System Framework)">Chapter 3 (System Framework)</option>
+              <option value="Chapter 4 (Findings / Evaluation)">Chapter 4 (Findings / Evaluation)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Thematic Domain</label>
+            <select id="inputDomain" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
               <option value="K-Pop Fandom & Communities">K-Pop Fandom & Communities</option>
               <option value="Misinformation & Verification">Misinformation & Verification</option>
               <option value="Platform Moderation & Algorithms">Platform Moderation & Algorithms</option>
@@ -342,124 +547,164 @@
             </select>
           </div>
           <div>
-            <label class="block text-slate-500 font-semibold mb-1">Methodology / Approach</label>
-            <input type="text" id="inputMethodology" placeholder="e.g. Quantitative Survey (PLS-SEM), Qualitative" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+            <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Methodology / Approach</label>
+            <input type="text" id="inputMethodology" placeholder="e.g. Quantitative Survey (PLS-SEM), Qualitative" class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-500 font-semibold mb-1">Key Findings & Academic Contribution (Drafted by AI / CrossRef)</label>
-          <textarea id="inputFindings" rows="2" placeholder="Summary of results and empirical findings..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700"></textarea>
+          <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Key Findings & Academic Contribution</label>
+          <textarea id="inputFindings" rows="2" placeholder="Summary of results, empirical findings, or theoretical contribution..." class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
         </div>
 
         <div>
-          <label class="block text-slate-500 font-semibold mb-1">Relevance to Your Project</label>
-          <textarea id="inputRelevance" rows="2" placeholder="Explain how this paper supports your problem statement, features, or framework..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700"></textarea>
+          <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Relevance to Your Project / Problem Statement</label>
+          <textarea id="inputRelevance" rows="2" placeholder="Explain specifically how this paper informs your features, problem statement, or thesis design..." class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
         </div>
 
         <div>
-          <label class="block text-slate-500 font-semibold mb-1">Direct Citable Claim / Quotation</label>
-          <input type="text" id="inputQuote" placeholder="Specific sentence or statement for thesis citation..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          <label class="block text-slate-500 dark:text-slate-400 font-semibold mb-1">Direct Citable Claim / Quotation</label>
+          <input type="text" id="inputQuote" placeholder="Specific verbatim sentence or punchy statement for in-text citation..." class="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
         </div>
 
-        <div class="pt-3 flex justify-between items-center border-t border-slate-200 dark:border-slate-700">
-          <span class="text-[11px] text-slate-400">Step 3: Review carefully before syncing</span>
-          <div class="flex gap-2">
-            <button type="button" id="cancelAddBtn" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 font-semibold text-xs">Cancel</button>
-            <button type="submit" id="saveRefSubmitBtn" class="px-5 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm">
-              <i class="fa-solid fa-cloud-arrow-up"></i> Review & Save to Sheets
-            </button>
-          </div>
+        <div class="pt-3.5 flex justify-between items-center border-t border-slate-200/80 dark:border-slate-800">
+          <button type="button" id="cancelAddBtn" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition">
+            Cancel
+          </button>
+          <button type="submit" id="saveRefSubmitBtn" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition">
+            <i class="fa-solid fa-floppy-disk"></i> Save Reference
+          </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL / SLIDE-OVER DETAIL DRAWER -->
-  <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all">
-      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700 flex items-start justify-between bg-slate-50 dark:bg-slate-850">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span id="modalId" class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300">REF-01</span>
+  <!-- MODAL / DETAIL DRAWER -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-all">
+    <div class="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+      
+      <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 flex items-start justify-between bg-slate-50/70 dark:bg-slate-850">
+        <div class="space-y-1.5 pr-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="modalId" class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300 border border-brand-200 dark:border-brand-800">REF-01</span>
             <span id="modalYear" class="text-xs text-slate-500 font-medium">2024</span>
-            <span id="modalChapterBadge" class="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 font-semibold">Chapter 2</span>
+            <span id="modalChapterBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800">Chapter 2</span>
+            <span id="modalThemeBadge"></span>
           </div>
-          <h3 id="modalTitle" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">Paper Title</h3>
-          <p id="modalAuthors" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Authors list</p>
+          <h3 id="modalTitle" class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">Paper Title</h3>
+          <p id="modalAuthors" class="text-xs text-slate-500 dark:text-slate-400">Authors list</p>
         </div>
-        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg">
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <div class="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
-        <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-[11px] font-bold text-slate-500 uppercase">Complete APA 7th Reference</span>
-            <button id="copyApaBtn" class="text-sky-600 dark:text-sky-400 text-xs font-semibold hover:underline flex items-center gap-1">
-              <i class="fa-regular fa-copy"></i> Copy
+        <div class="bg-slate-50 dark:bg-slate-950/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">APA 7th Reference</span>
+            <button id="copyApaBtn" class="text-brand-600 dark:text-brand-400 text-xs font-semibold hover:underline flex items-center gap-1 active:scale-95 transition">
+              <i class="fa-regular fa-copy"></i> Copy APA
             </button>
           </div>
           <p id="modalApaCitation" class="text-slate-700 dark:text-slate-300 italic select-all leading-relaxed"></p>
         </div>
 
-        <div>
-          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
-            <i class="fa-solid fa-square-check text-sky-600"></i> Key Findings & Academic Contribution
-          </h4>
-          <p id="modalFindings" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800"></p>
+        <div class="bg-slate-50 dark:bg-slate-950/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">BibTeX Entry</span>
+            <button id="copyBibtexModalBtn" class="text-indigo-600 dark:text-indigo-400 text-xs font-semibold hover:underline flex items-center gap-1 active:scale-95 transition">
+              <i class="fa-regular fa-copy"></i> Copy BibTeX
+            </button>
+          </div>
+          <pre id="modalBibtexCode" class="text-[11px] font-mono text-slate-600 dark:text-slate-400 overflow-x-auto p-2 bg-slate-100 dark:bg-slate-900 rounded-lg select-all leading-snug"></pre>
         </div>
 
         <div>
-          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1.5 text-xs sm:text-sm">
+            <i class="fa-solid fa-square-check text-brand-600"></i> Key Findings & Academic Contribution
+          </h4>
+          <p id="modalFindings" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-850/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80"></p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1.5 text-xs sm:text-sm">
             <i class="fa-solid fa-quote-left text-amber-500"></i> Direct Citable Claim / Quotation
           </h4>
-          <div class="border-l-4 border-amber-400 pl-3 py-1 italic text-slate-700 dark:text-slate-300 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-lg">
+          <div class="border-l-4 border-amber-400 pl-3.5 py-1.5 italic text-slate-700 dark:text-slate-300 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-xl">
             <p id="modalQuote"></p>
           </div>
         </div>
 
         <div>
-          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1.5 text-xs sm:text-sm">
             <i class="fa-solid fa-bullseye text-emerald-600"></i> Relevance to Your Thesis Project
           </h4>
-          <p id="modalRelevance" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-900/30"></p>
+          <p id="modalRelevance" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-emerald-50/40 dark:bg-emerald-950/20 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30"></p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
           <div>
-            <span class="text-[11px] text-slate-400 font-semibold block">PUBLICATION VENUE</span>
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">PUBLICATION VENUE</span>
             <span id="modalVenue" class="font-medium text-slate-700 dark:text-slate-300"></span>
           </div>
           <div>
-            <span class="text-[11px] text-slate-400 font-semibold block">DOI LINK</span>
-            <a id="modalDoiLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline break-all inline-flex items-center gap-1">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">DOI LINK</span>
+            <a id="modalDoiLink" href="#" target="_blank" rel="noopener noreferrer" class="text-brand-600 dark:text-brand-400 hover:underline break-all inline-flex items-center gap-1">
               <span>View Source</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
             </a>
           </div>
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 dark:bg-slate-850 border-t border-slate-200 dark:border-slate-700 flex justify-end">
-        <button id="modalDismissBottom" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600">
-          Close Preview
+      <div class="p-3.5 bg-slate-50/80 dark:bg-slate-850 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button id="modalEditBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+          </button>
+          <button id="modalDeleteBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition">
+            <i class="fa-solid fa-trash mr-1"></i> Delete
+          </button>
+        </div>
+        <button id="modalDismissBottom" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white transition">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM DELETE DIALOG -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 text-center space-y-3">
+      <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-600 mx-auto flex items-center justify-center text-xl">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">Delete Reference?</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400" id="deleteConfirmText">
+        Are you sure you want to remove this paper from your literature matrix?
+      </p>
+      <div class="flex items-center justify-center gap-2 pt-2">
+        <button id="cancelDeleteBtn" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          Cancel
+        </button>
+        <button id="confirmDeleteBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs">
+          Yes, Delete
         </button>
       </div>
     </div>
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900/95 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none border border-slate-800 dark:border-slate-200">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-sm"></i>
     <span id="toastMsg">Action completed</span>
   </div>
 
   <script>
-    // Live Google Apps Script Endpoint
     const API_URL = "https://script.google.com/macros/s/AKfycbynE5Q4KP3ZwvTDCsy-hIfStK3BqjE8DDoKd_HTCrba0ILh7aOBnNgSSUZu5uwspjM/exec";
+    const STORAGE_KEY = "thesis_matrix_dataset_v3";
 
-    // 25 Pre-indexed Literature Studies Fallback Dataset
+    // 25 Curated Initial Dataset
     const initialDefaultDataset = [
       {
         id: "REF-01", citationKey: "Apuke et al. (2024)", authors: "Apuke, O. D., Omar, B., Tunca, E. A., & Gever, V. C.",
@@ -713,9 +958,13 @@
       }
     ];
 
-    // State management
     let state = {
-      data: [...initialDefaultDataset],
+      data: [],
+      viewMode: 'table',
+      selectedIds: new Set(),
+      currentPage: 1,
+      pageSize: 25,
+      sortBy: 'id-asc',
       filters: {
         search: '',
         theme: 'all',
@@ -725,64 +974,74 @@
       }
     };
 
-    // DOM Elements
-    const tableBody = document.getElementById('tableBody');
-    const searchInput = document.getElementById('searchInput');
-    const filterReading = document.getElementById('filterReadingStatus');
-    const filterCitation = document.getElementById('filterCitationStatus');
-    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
-    const visibleRowCount = document.getElementById('visibleRowCount');
-    const exportCsvBtn = document.getElementById('exportCsvBtn');
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
-    const themeToggleBtn = document.getElementById('themeToggleBtn');
-    const syncIndicator = document.getElementById('syncIndicator');
-
-    // Add Modal Elements
-    const addModal = document.getElementById('addModal');
-    const openAddModalBtn = document.getElementById('openAddModalBtn');
-    const closeAddModalBtn = document.getElementById('closeAddModalBtn');
-    const cancelAddBtn = document.getElementById('cancelAddBtn');
-    const addRefForm = document.getElementById('addRefForm');
-    const quickDoiInput = document.getElementById('quickDoiInput');
-    const fetchDoiBtn = document.getElementById('fetchDoiBtn');
-    const fetchBtnText = document.getElementById('fetchBtnText');
-    const fetchSpinner = document.getElementById('fetchSpinner');
-    const autoFillBadge = document.getElementById('autoFillBadge');
-
-    // Detail Modal Elements
-    const detailModal = document.getElementById('detailModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalDismissBottom = document.getElementById('modalDismissBottom');
-    const copyApaBtn = document.getElementById('copyApaBtn');
-    const modalId = document.getElementById('modalId');
-    const modalYear = document.getElementById('modalYear');
-    const modalChapterBadge = document.getElementById('modalChapterBadge');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalAuthors = document.getElementById('modalAuthors');
-    const modalApaCitation = document.getElementById('modalApaCitation');
-    const modalFindings = document.getElementById('modalFindings');
-    const modalQuote = document.getElementById('modalQuote');
-    const modalRelevance = document.getElementById('modalRelevance');
-    const modalVenue = document.getElementById('modalVenue');
-    const modalDoiLink = document.getElementById('modalDoiLink');
-
     let currentModalPaper = null;
+    let pendingDeleteId = null;
 
-    // Load from Google Sheets Apps Script API
-    async function loadReferences() {
+    function initializeData() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            state.data = parsed;
+            updateSyncIndicator('local', 'Local Storage Synced');
+            renderView();
+            updateDashboardKPIs();
+            return;
+          }
+        } catch (e) {
+          console.warn("Corrupt local storage data:", e);
+        }
+      }
+      
+      state.data = [...initialDefaultDataset];
+      saveToLocalStorage();
+      updateSyncIndicator('local', 'Default Dataset Loaded');
+      renderView();
+      updateDashboardKPIs();
+      loadCloudReferences();
+    }
+
+    function saveToLocalStorage() {
       try {
-        syncIndicator.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Fetching from Google Sheets...`;
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("Network response was not ok");
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+      } catch (err) {
+        console.error("Local storage save error:", err);
+      }
+    }
+
+    function updateSyncIndicator(type, message) {
+      const el = document.getElementById('syncIndicator');
+      if (!el) return;
+      if (type === 'syncing') {
+        el.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-brand-500"></i> ${message}`;
+      } else if (type === 'cloud') {
+        el.innerHTML = `<i class="fa-solid fa-cloud-arrow-down text-emerald-500"></i> ${message}`;
+      } else if (type === 'error') {
+        el.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> ${message}`;
+      } else {
+        el.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> ${message}`;
+      }
+    }
+
+    async function loadCloudReferences() {
+      try {
+        updateSyncIndicator('syncing', 'Syncing Google Sheets...');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch(API_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (!res.ok) throw new Error("HTTP " + res.status);
         const cloudData = await res.json();
         
         if (Array.isArray(cloudData) && cloudData.length > 0) {
-          state.data = cloudData.map(item => ({
-            id: item.id || item.ID || `REF-${Math.floor(Math.random()*1000)}`,
+          state.data = cloudData.map((item, idx) => ({
+            id: item.id || item.ID || `REF-${String(idx + 1).padStart(2, '0')}`,
             citationKey: item.citationKey || item["Citation Key"] || "Unknown citation",
             authors: item.authors || item.Authors || "Unknown authors",
-            year: item.year || item.Year || 2025,
+            year: Number(item.year || item.Year) || 2025,
             title: item.title || item.Title || "Untitled Paper",
             journal: item.journal || item.venue || item.Venue || "Publication",
             volumePages: item.volumePages || item["Volume/Pages"] || "",
@@ -796,348 +1055,69 @@
             readStatus: item.readStatus || item["Reading Status"] || "Unread",
             citeStatus: item.citeStatus || item["Citation Status"] || "Not Used Yet"
           }));
-          syncIndicator.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-500"></i> Connected to Google Sheets`;
-        } else {
-          syncIndicator.innerHTML = `<i class="fa-solid fa-circle-info text-amber-500"></i> Loaded default template set`;
+
+          saveToLocalStorage();
+          updateSyncIndicator('cloud', 'Live Cloud Synced');
+          renderView();
+          updateDashboardKPIs();
+          showToast("Synchronized with Google Sheets database!");
         }
       } catch (err) {
-        console.warn("Could not load from Google Apps Script. Using local cache/default data:", err);
-        syncIndicator.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Offline mode (Local memory)`;
-      } finally {
-        renderTable();
-        updateDashboardKPIs();
+        updateSyncIndicator('local', 'Offline / Local Cache');
       }
     }
 
-    // Submit newly added paper to Google Apps Script
-    async function submitNewReference(newRefData) {
+    async function submitReferenceToCloud(refData) {
       try {
-        syncIndicator.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Syncing to Google Sheets...`;
-        
-        state.data.unshift(newRefData);
-        renderTable();
-        updateDashboardKPIs();
-
-        const response = await fetch(API_URL, {
+        updateSyncIndicator('syncing', 'Saving to Google Sheets...');
+        await fetch(API_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8",
-          },
-          body: JSON.stringify(newRefData)
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(refData)
         });
-
-        const result = await response.json();
-        showToast(`Saved "${newRefData.citationKey}" to Google Sheets!`);
-        syncIndicator.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-500"></i> Synced with Google Sheets`;
-      } catch (error) {
-        console.error("Error saving reference to Google Sheets:", error);
-        showToast("Saved locally (Check Google Apps Script Web App permissions).");
-        syncIndicator.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500"></i> Sync error (Saved locally)`;
+        updateSyncIndicator('cloud', 'Saved to Cloud & Local');
+      } catch (err) {
+        updateSyncIndicator('local', 'Saved locally');
       }
     }
 
- // Updated handleDoiAutoFill with safe element checks and robust fallback parsing
-async function handleDoiAutoFill() {
-  const quickDoiInput = document.getElementById('quickDoiInput');
-  const fetchBtnText = document.getElementById('fetchBtnText');
-  const fetchSpinner = document.getElementById('fetchSpinner');
-  const fetchDoiBtn = document.getElementById('fetchDoiBtn');
-  const autoFillBadge = document.getElementById('autoFillBadge');
-
-  let rawInput = quickDoiInput ? quickDoiInput.value.trim() : '';
-  if (!rawInput) {
-    alert("Please enter a valid DOI link or identifier (e.g., 10.1177/01655515221121942).");
-    return;
-  }
-
-  // Extract clean DOI identifier
-  const doiPattern = /(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/;
-  const match = rawInput.match(doiPattern);
-  const cleanDoi = match ? match[1] : rawInput;
-
-  if (fetchBtnText) fetchBtnText.classList.add('hidden');
-  if (fetchSpinner) fetchSpinner.classList.remove('hidden');
-  if (fetchDoiBtn) fetchDoiBtn.disabled = true;
-
-  try {
-    // 1. Fetch metadata from CrossRef
-    const crRes = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
-    if (!crRes.ok) throw new Error("CrossRef lookup failed. Check DOI identifier.");
-    const crJson = await crRes.json();
-    const crData = crJson.message;
-
-    // 2. Fetch Abstract & TLDR (Check Semantic Scholar first, then fallback to CrossRef abstract)
-    let paperAbstract = "";
-    let paperTldr = "";
-
-    try {
-      const s2Res = await fetch(`https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(cleanDoi)}?fields=abstract,tldr`);
-      if (s2Res.ok) {
-        const s2Data = await s2Res.json();
-        paperAbstract = s2Data.abstract || "";
-        paperTldr = s2Data.tldr?.text || "";
-      }
-    } catch (e) {
-      console.warn("Semantic Scholar fallback skipped:", e);
+    function formatApaCitation(item) {
+      const volPart = item.volumePages ? `, ${item.volumePages}` : '';
+      const doiPart = item.doi && item.doi !== '#' ? `. ${item.doi}` : '';
+      return `${item.authors} (${item.year}). ${item.title}. ${item.journal}${volPart}${doiPart}`;
     }
 
-    // If Semantic Scholar had no abstract, check if CrossRef has an embedded JATS abstract
-    if (!paperAbstract && crData.abstract) {
-      paperAbstract = crData.abstract.replace(/<[^>]*>?/gm, '').trim();
+    function formatBibtex(item) {
+      const cleanKey = (item.citationKey || item.id).replace(/[^a-zA-Z0-9]/g, '');
+      const authorsBib = (item.authors || '').replace(/,\s*&/g, ' and').replace(/,/g, ' and');
+      const cleanDoi = (item.doi || '').replace('https://doi.org/', '');
+
+      return `@article{${cleanKey},\n` +
+             `  author = {${authorsBib}},\n` +
+             `  title = {${item.title}},\n` +
+             `  journal = {${item.journal}},\n` +
+             `  year = {${item.year}},\n` +
+             (item.volumePages ? `  pages = {${item.volumePages}},\n` : '') +
+             (cleanDoi ? `  doi = {${cleanDoi}},\n` : '') +
+             `  note = {Target: ${item.chapter}}\n` +
+             `}`;
     }
 
-    // 3. Authors & Citation Key (Handles single, multi, and corporate authors)
-    let authorsList = "Unknown Authors";
-    let firstAuthor = "Author";
-
-    if (Array.isArray(crData.author) && crData.author.length > 0) {
-      firstAuthor = crData.author[0].family || crData.author[0].name || "Author";
-      authorsList = crData.author.map(a => {
-        if (a.name) return a.name; // Corporate author
-        const family = a.family || '';
-        const initial = a.given ? `${a.given.trim()[0]}.` : '';
-        return [family, initial].filter(Boolean).join(', ');
-      }).join(', ');
-    }
-
-    // Date extraction
-    const pubYear = crData["published-print"]?.["date-parts"]?.[0]?.[0] || 
-                    crData["published-online"]?.["date-parts"]?.[0]?.[0] || 
-                    crData["created"]?.["date-parts"]?.[0]?.[0] || 2025;
-
-    const citeKey = crData.author && crData.author.length > 2 
-      ? `${firstAuthor} et al. (${pubYear})` 
-      : `${firstAuthor} (${pubYear})`;
-
-    // Helper: Safely populate input by ID only if element exists
-    const setVal = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) el.value = val;
-    };
-
-    setVal('inputCiteKey', citeKey);
-    setVal('inputAuthors', authorsList);
-    setVal('inputYear', pubYear);
-    setVal('inputTitle', crData.title?.[0] || "Untitled Article");
-    setVal('inputVenue', crData["container-title"]?.[0] || crData.publisher || "");
-    
-    const vol = crData.volume ? `Vol. ${crData.volume}` : '';
-    const iss = crData.issue ? `No. ${crData.issue}` : '';
-    const pg = crData.page ? `pp. ${crData.page}` : (crData.article_number ? `Art. ${crData.article_number}` : '');
-    setVal('inputVolumePages', [vol, iss, pg].filter(Boolean).join(', '));
-    setVal('inputDoi', `https://doi.org/${cleanDoi}`);
-
-    // 4. Draft Claims, Methodology, Relevance, and Notes
-    extractAcademicSynthesis(crData.title?.[0] || "", paperAbstract || paperTldr);
-
-    if (autoFillBadge) autoFillBadge.classList.remove('hidden');
-    if (typeof showToast === 'function') {
-      showToast("Parsed metadata and drafted claims! Review before saving.");
-    }
-  } catch (err) {
-    console.error("DOI Lookup error:", err);
-    alert("Could not extract paper data. Please verify the DOI or fill the fields manually.");
-  } finally {
-    if (fetchBtnText) fetchBtnText.classList.remove('hidden');
-    if (fetchSpinner) fetchSpinner.classList.add('hidden');
-    if (fetchDoiBtn) fetchDoiBtn.disabled = false;
-  }
-}
-
-// Safe heuristic extractor with null-guards for all form elements
-function extractAcademicSynthesis(title, text) {
-  const cleanText = (text || '').replace(/<[^>]*>?/gm, '').trim();
-  const content = `${title} ${cleanText}`.toLowerCase();
-
-  const setVal = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.value = val;
-  };
-
-  // Determine Methodology
-  let method = "Empirical / Mixed Methods";
-  if (content.includes("survey") || content.includes("pls-sem") || content.includes("questionnaire")) {
-    method = "Quantitative Survey (PLS-SEM / Regression)";
-  } else if (content.includes("interview") || content.includes("qualitative") || content.includes("case study")) {
-    method = "Qualitative Case Study / Thematic Analysis";
-  } else if (content.includes("systematic review") || content.includes("meta-analysis")) {
-    method = "Systematic Literature Review";
-  }
-  setVal('inputMethodology', method);
-
-  // Extract Citable Claim / Quote safely without regex lookbehind
-  if (cleanText.length > 80) {
-    // Cross-browser safe sentence splitting
-    const rawSentences = cleanText.split(/[.?!]\s+/).map(s => s.trim()).filter(Boolean);
-    const keySentence = rawSentences.length > 2 
-      ? rawSentences[rawSentences.length - 2] 
-      : rawSentences[0];
-
-    setVal('inputFindings', keySentence ? `${keySentence}.` : cleanText.slice(0, 150));
-    setVal('inputQuote', keySentence ? `"${keySentence}."` : `"${cleanText.slice(0, 100)}..."`);
-    
-    // Methodological Limitations
-    if (method.includes("Quantitative")) {
-      setVal('inputNotes', "Cross-sectional survey data; relies on self-reported perceptions rather than system logs. Sample limited to specific platform demographics.");
-    } else if (method.includes("Qualitative")) {
-      setVal('inputNotes', "Sample size limits statistical generalizability; findings reflect localized community context.");
-    } else {
-      setVal('inputNotes', "Theoretical scope bounded by platform-specific API policies and historical data availability.");
-    }
-  } else {
-    setVal('inputFindings', `Analyzes ${title} and its implications for user behavior and digital platform governance.`);
-    setVal('inputQuote', `"[Extract direct quotation from Introduction or Discussion section]."`);
-    setVal('inputNotes', "Verify methodology section for sample constraints, geographical boundaries, or temporal limitations.");
-  }
-
-  // Thesis Relevance & Chapter Mapping
-  if (content.includes("misinformation") || content.includes("verification") || content.includes("credibility")) {
-    setVal('inputDomain', "Misinformation & Verification");
-    setVal('inputChapter', "Chapter 3 (System Framework)");
-    setVal('inputRelevance', "Validates the necessity of verification badges, authenticity checks, and provenance tracking in the platform architecture.");
-  } else if (content.includes("fandom") || content.includes("k-pop") || content.includes("community")) {
-    setVal('inputDomain', "K-Pop Fandom & Communities");
-    setVal('inputChapter', "Chapter 2 (Literature Review)");
-    setVal('inputRelevance', "Establishes contextual grounding on fan mobilization, event coordination, and digital trust dynamics in fan communities.");
-  } else {
-    setVal('inputDomain', "Information Overload");
-    setVal('inputChapter', "Chapter 1 (Problem Statement)");
-    setVal('inputRelevance', "Provides empirical justification for consolidating fragmented social channels into a single centralized dashboard.");
-  }
-}
-
-   // Badge styling helper
     function getThemeBadge(theme) {
       switch (theme) {
         case 'K-Pop Fandom & Communities':
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-pink-100 text-pink-800 dark:bg-pink-900/60 dark:text-pink-300">K-Pop Fandom</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-pink-50 text-pink-700 dark:bg-pink-950/80 dark:text-pink-300 border border-pink-200 dark:border-pink-800/60 whitespace-nowrap"><i class="fa-solid fa-heart mr-1 text-[9px]"></i>K-Pop Fandom</span>';
         case 'Misinformation & Verification':
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300">Misinformation</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 whitespace-nowrap"><i class="fa-solid fa-shield-halved mr-1 text-[9px]"></i>Misinformation</span>';
         case 'Platform Moderation & Algorithms':
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300">Governance</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 whitespace-nowrap"><i class="fa-solid fa-sliders mr-1 text-[9px]"></i>Moderation</span>';
         case 'Information Overload':
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">Info Overload</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60 whitespace-nowrap"><i class="fa-solid fa-brain mr-1 text-[9px]"></i>Info Overload</span>';
         case 'Knowledge Sharing & Engagement':
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">Knowledge Sharing</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 whitespace-nowrap"><i class="fa-solid fa-share-nodes mr-1 text-[9px]"></i>Knowledge</span>';
         default:
-          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">General</span>';
+          return '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap">General</span>';
       }
-    }
-
-    // Render Table Rows
-    function renderTable() {
-      const filtered = state.data.filter(item => {
-        const query = state.filters.search.toLowerCase();
-        const matchesSearch = query === '' || 
-          (item.title && item.title.toLowerCase().includes(query)) ||
-          (item.authors && item.authors.toLowerCase().includes(query)) ||
-          (item.citationKey && item.citationKey.toLowerCase().includes(query)) ||
-          (item.journal && item.journal.toLowerCase().includes(query)) ||
-          (item.theme && item.theme.toLowerCase().includes(query)) ||
-          (item.relevance && item.relevance.toLowerCase().includes(query));
-
-        const matchesTheme = state.filters.theme === 'all' || item.theme === state.filters.theme;
-        const matchesChapter = state.filters.chapter === 'all' || (item.chapter && item.chapter.startsWith(state.filters.chapter));
-        const matchesRead = state.filters.readingStatus === 'all' || item.readStatus === state.filters.readingStatus;
-        const matchesCite = state.filters.citationStatus === 'all' || item.citeStatus === state.filters.citationStatus;
-
-        return matchesSearch && matchesTheme && matchesChapter && matchesRead && matchesCite;
-      });
-
-      visibleRowCount.textContent = filtered.length;
-
-      if (filtered.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="9" class="text-center py-12 text-slate-400">
-              <i class="fa-solid fa-folder-open text-3xl mb-2 block"></i>
-              No literature references matched your criteria.
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tableBody.innerHTML = filtered.map(item => `
-        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-750 transition border-b border-slate-100 dark:border-slate-800">
-          <td class="py-3 px-3 text-center">
-            <span class="font-mono text-[11px] font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800">
-              ${item.id}
-            </span>
-          </td>
-
-          <td class="py-3 px-3">
-            <div class="font-semibold text-slate-900 dark:text-white">${item.citationKey}</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[180px]" title="${item.authors}">${item.authors}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span> Year: ${item.year}
-            </div>
-          </td>
-
-          <td class="py-3 px-4">
-            <a href="javascript:void(0)" onclick="openDetailModal('${item.id}')" class="font-medium text-slate-800 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 block line-clamp-2 leading-snug">
-              ${item.title}
-            </a>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 italic flex flex-wrap items-center gap-x-2">
-              <span>${item.journal}</span>
-              ${item.volumePages ? `<span>•</span><span>${item.volumePages}</span>` : ''}
-            </div>
-            <div class="mt-1">
-              <a href="${item.doi}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1 font-mono">
-                <i class="fa-solid fa-link text-[10px]"></i> DOI
-              </a>
-            </div>
-          </td>
-
-          <td class="py-3 px-3 space-y-1">
-            <div>${getThemeBadge(item.theme)}</div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <i class="fa-solid fa-microscope text-[10px] text-slate-400"></i> ${item.methodology || 'Qualitative/Empirical'}
-            </div>
-          </td>
-
-          <td class="py-3 px-4">
-            <p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
-              ${item.relevance || 'Relevant to thesis development and synthesis.'}
-            </p>
-          </td>
-
-          <td class="py-3 px-3 text-center">
-            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              ${item.chapter}
-            </span>
-          </td>
-
-          <td class="py-3 px-3">
-            <select onchange="updateReadStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1.5 border focus:outline-none focus:ring-1 focus:ring-sky-500 w-full transition ${getReadStatusStyle(item.readStatus)}">
-              <option value="Unread" ${item.readStatus === 'Unread' ? 'selected' : ''}>Unread</option>
-              <option value="Skimmed" ${item.readStatus === 'Skimmed' ? 'selected' : ''}>Skimmed</option>
-              <option value="Read & Annotated" ${item.readStatus === 'Read & Annotated' ? 'selected' : ''}>Read & Annotated</option>
-              <option value="Synthesized" ${item.readStatus === 'Synthesized' ? 'selected' : ''}>Synthesized</option>
-            </select>
-          </td>
-
-          <td class="py-3 px-3">
-            <select onchange="updateCiteStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1.5 border focus:outline-none focus:ring-1 focus:ring-sky-500 w-full transition ${getCiteStatusStyle(item.citeStatus)}">
-              <option value="Not Used Yet" ${item.citeStatus === 'Not Used Yet' ? 'selected' : ''}>Not Used Yet</option>
-              <option value="Drafted" ${item.citeStatus === 'Drafted' ? 'selected' : ''}>Drafted</option>
-              <option value="Final Cited" ${item.citeStatus === 'Final Cited' ? 'selected' : ''}>Final Cited</option>
-              <option value="Archive" ${item.citeStatus === 'Archive' ? 'selected' : ''}>Archive</option>
-            </select>
-          </td>
-
-          <td class="py-3 px-3 text-center">
-            <div class="flex items-center justify-center space-x-1">
-              <button onclick="copyInTextCitation('${item.citationKey}')" title="Copy In-Text Citation" class="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
-                <i class="fa-solid fa-quote-right text-xs"></i>
-              </button>
-              <button onclick="openDetailModal('${item.id}')" title="View Full Details" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
-                <i class="fa-solid fa-circle-info text-xs"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
     }
 
     function getReadStatusStyle(status) {
@@ -1147,7 +1127,7 @@ function extractAcademicSynthesis(title, text) {
         case 'Skimmed':
           return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900';
         case 'Read & Annotated':
-          return 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-900';
+          return 'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-950/40 dark:text-brand-300 dark:border-brand-900';
         case 'Synthesized':
           return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900';
         default:
@@ -1158,15 +1138,347 @@ function extractAcademicSynthesis(title, text) {
     function getCiteStatusStyle(status) {
       switch (status) {
         case 'Not Used Yet':
-          return 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600';
+          return 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700';
         case 'Drafted':
           return 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-900';
         case 'Final Cited':
           return 'bg-emerald-50 text-emerald-800 font-bold border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800';
         case 'Archive':
-          return 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700';
+          return 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-850 dark:text-slate-500 dark:border-slate-800';
         default:
           return 'bg-slate-50 text-slate-600 border-slate-200';
+      }
+    }
+
+    function getProcessedData() {
+      let filtered = state.data.filter(item => {
+        const query = state.filters.search.toLowerCase();
+        const matchesSearch = query === '' || 
+          (item.title && item.title.toLowerCase().includes(query)) ||
+          (item.authors && item.authors.toLowerCase().includes(query)) ||
+          (item.citationKey && item.citationKey.toLowerCase().includes(query)) ||
+          (item.journal && item.journal.toLowerCase().includes(query)) ||
+          (item.theme && item.theme.toLowerCase().includes(query)) ||
+          (item.findings && item.findings.toLowerCase().includes(query)) ||
+          (item.relevance && item.relevance.toLowerCase().includes(query));
+
+        const matchesTheme = state.filters.theme === 'all' || item.theme === state.filters.theme;
+        const matchesChapter = state.filters.chapter === 'all' || (item.chapter && item.chapter.startsWith(state.filters.chapter));
+        const matchesRead = state.filters.readingStatus === 'all' || item.readStatus === state.filters.readingStatus;
+        const matchesCite = state.filters.citationStatus === 'all' || item.citeStatus === state.filters.citationStatus;
+
+        return matchesSearch && matchesTheme && matchesChapter && matchesRead && matchesCite;
+      });
+
+      filtered.sort((a, b) => {
+        switch (state.sortBy) {
+          case 'year-desc': return (b.year || 0) - (a.year || 0);
+          case 'year-asc': return (a.year || 0) - (b.year || 0);
+          case 'title-asc': return (a.title || '').localeCompare(b.title || '');
+          case 'cite-asc': return (a.citationKey || '').localeCompare(b.citationKey || '');
+          case 'id-asc':
+          default:
+            return (a.id || '').localeCompare(b.id || '', undefined, { numeric: true });
+        }
+      });
+
+      return filtered;
+    }
+
+    function renderView() {
+      const processed = getProcessedData();
+      const totalCount = processed.length;
+      
+      document.getElementById('totalRefCount').textContent = state.data.length;
+      document.getElementById('visibleRowCount').textContent = totalCount;
+      document.getElementById('cardsVisibleCount').textContent = totalCount;
+
+      const emptyState = document.getElementById('emptyState');
+      const tableWrapper = document.getElementById('tableViewContainer');
+      const cardsWrapper = document.getElementById('cardViewContainer');
+
+      if (totalCount === 0) {
+        emptyState.classList.remove('hidden');
+        tableWrapper.classList.add('hidden');
+        cardsWrapper.classList.add('hidden');
+        updateBulkBar();
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      if (state.viewMode === 'table') {
+        tableWrapper.classList.remove('hidden');
+        cardsWrapper.classList.add('hidden');
+        renderTable(processed);
+      } else {
+        tableWrapper.classList.add('hidden');
+        cardsWrapper.classList.remove('hidden');
+        renderCards(processed);
+      }
+
+      updateBulkBar();
+    }
+
+    function renderTable(dataset) {
+      const tableBody = document.getElementById('tableBody');
+      const pageSize = state.pageSize === 'all' ? dataset.length : parseInt(state.pageSize, 10);
+      const totalPages = Math.ceil(dataset.length / pageSize) || 1;
+      
+      if (state.currentPage > totalPages) state.currentPage = 1;
+      
+      const startIndex = (state.currentPage - 1) * pageSize;
+      const paginatedData = dataset.slice(startIndex, startIndex + pageSize);
+
+      renderPaginationControls(totalPages);
+
+      tableBody.innerHTML = paginatedData.map(item => {
+        const isSelected = state.selectedIds.has(item.id);
+        return `
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${isSelected ? 'bg-brand-50/50 dark:bg-brand-950/20' : ''}">
+            <td class="py-3 px-3 text-center">
+              <input type="checkbox" onchange="toggleSelect('${item.id}', this.checked)" ${isSelected ? 'checked' : ''} class="rounded border-slate-300 dark:border-slate-700 text-brand-600 focus:ring-brand-500 cursor-pointer">
+            </td>
+
+            <td class="py-3 px-2 text-center">
+              <span class="font-mono text-[10px] font-bold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/80 px-2 py-0.5 rounded-md border border-brand-200/80 dark:border-brand-800">
+                ${item.id}
+              </span>
+            </td>
+
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 dark:text-white">${item.citationKey}</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[170px]" title="${item.authors}">${item.authors}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1 font-mono">
+                <span>Year: ${item.year}</span>
+              </div>
+            </td>
+
+            <td class="py-3 px-4">
+              <a href="javascript:void(0)" onclick="openDetailModal('${item.id}')" class="font-medium text-slate-900 dark:text-slate-100 hover:text-brand-600 dark:hover:text-brand-400 block line-clamp-2 leading-snug">
+                ${item.title}
+              </a>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 italic flex flex-wrap items-center gap-x-1.5">
+                <span>${item.journal}</span>
+                ${item.volumePages ? `<span>•</span><span>${item.volumePages}</span>` : ''}
+              </div>
+              <div class="mt-1 flex items-center gap-2">
+                <a href="${item.doi}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-brand-600 dark:text-brand-400 hover:underline inline-flex items-center gap-1 font-mono">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> DOI
+                </a>
+              </div>
+            </td>
+
+            <td class="py-3 px-3 space-y-1">
+              <div>${getThemeBadge(item.theme)}</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate max-w-[160px]">
+                <i class="fa-solid fa-microscope text-[10px] text-slate-400"></i> ${item.methodology || 'Empirical'}
+              </div>
+            </td>
+
+            <td class="py-3 px-4">
+              <p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                ${item.relevance || 'Relevant to thesis framework.'}
+              </p>
+            </td>
+
+            <td class="py-3 px-3 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
+                ${item.chapter.replace(/\s\(.*\)/, '')}
+              </span>
+            </td>
+
+            <td class="py-3 px-3">
+              <select onchange="updateReadStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1 border focus:outline-none focus:ring-1 focus:ring-brand-500 w-full transition cursor-pointer ${getReadStatusStyle(item.readStatus)}">
+                <option value="Unread" ${item.readStatus === 'Unread' ? 'selected' : ''}>Unread</option>
+                <option value="Skimmed" ${item.readStatus === 'Skimmed' ? 'selected' : ''}>Skimmed</option>
+                <option value="Read & Annotated" ${item.readStatus === 'Read & Annotated' ? 'selected' : ''}>Read & Annotated</option>
+                <option value="Synthesized" ${item.readStatus === 'Synthesized' ? 'selected' : ''}>Synthesized</option>
+              </select>
+            </td>
+
+            <td class="py-3 px-3">
+              <select onchange="updateCiteStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1 border focus:outline-none focus:ring-1 focus:ring-brand-500 w-full transition cursor-pointer ${getCiteStatusStyle(item.citeStatus)}">
+                <option value="Not Used Yet" ${item.citeStatus === 'Not Used Yet' ? 'selected' : ''}>Not Used Yet</option>
+                <option value="Drafted" ${item.citeStatus === 'Drafted' ? 'selected' : ''}>Drafted</option>
+                <option value="Final Cited" ${item.citeStatus === 'Final Cited' ? 'selected' : ''}>Final Cited</option>
+                <option value="Archive" ${item.citeStatus === 'Archive' ? 'selected' : ''}>Archive</option>
+              </select>
+            </td>
+
+            <td class="py-3 px-3 text-center">
+              <div class="flex items-center justify-center space-x-1">
+                <button onclick="copyInTextCitation('${item.citationKey}')" title="Copy in-text citation key" class="p-1.5 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition">
+                  <i class="fa-solid fa-quote-right text-xs"></i>
+                </button>
+                <button onclick="openDetailModal('${item.id}')" title="View details & BibTeX" class="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition">
+                  <i class="fa-solid fa-eye text-xs"></i>
+                </button>
+                <button onclick="openEditModal('${item.id}')" title="Edit paper" class="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition">
+                  <i class="fa-solid fa-pen text-xs"></i>
+                </button>
+                <button onclick="promptDelete('${item.id}')" title="Delete paper" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderCards(dataset) {
+      const grid = document.getElementById('cardsGrid');
+      grid.innerHTML = dataset.map(item => {
+        const isSelected = state.selectedIds.has(item.id);
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between ${isSelected ? 'ring-2 ring-brand-500' : ''}">
+            
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" onchange="toggleSelect('${item.id}', this.checked)" ${isSelected ? 'checked' : ''} class="rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                  <span class="font-mono text-[10px] font-bold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
+                    ${item.id}
+                  </span>
+                  <span class="text-xs text-slate-400 font-mono">${item.year}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="copyInTextCitation('${item.citationKey}')" title="Copy key" class="p-1.5 text-slate-400 hover:text-brand-600 rounded">
+                    <i class="fa-solid fa-quote-right text-xs"></i>
+                  </button>
+                  <button onclick="openEditModal('${item.id}')" title="Edit" class="p-1.5 text-slate-400 hover:text-amber-600 rounded">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                  </button>
+                  <button onclick="promptDelete('${item.id}')" title="Delete" class="p-1.5 text-slate-400 hover:text-rose-600 rounded">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <h3 onclick="openDetailModal('${item.id}')" class="font-bold text-sm sm:text-base text-slate-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 cursor-pointer leading-snug line-clamp-2">
+                ${item.title}
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 truncate" title="${item.authors}">${item.authors}</p>
+              
+              <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                ${getThemeBadge(item.theme)}
+                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  ${item.chapter.replace(/\s\(.*\)/, '')}
+                </span>
+              </div>
+            </div>
+
+            <div class="my-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-850/60 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 space-y-1.5">
+              <p class="line-clamp-2 text-[11px] leading-relaxed">
+                <strong class="text-slate-900 dark:text-slate-100 font-semibold">Findings:</strong> ${item.findings || 'Not annotated yet.'}
+              </p>
+              <p class="line-clamp-2 text-[11px] leading-relaxed text-brand-700 dark:text-brand-400">
+                <strong class="font-semibold">Relevance:</strong> ${item.relevance || 'Thesis grounding.'}
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-400 font-semibold uppercase mb-0.5">Reading</label>
+                  <select onchange="updateReadStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1 border w-full ${getReadStatusStyle(item.readStatus)}">
+                    <option value="Unread" ${item.readStatus === 'Unread' ? 'selected' : ''}>Unread</option>
+                    <option value="Skimmed" ${item.readStatus === 'Skimmed' ? 'selected' : ''}>Skimmed</option>
+                    <option value="Read & Annotated" ${item.readStatus === 'Read & Annotated' ? 'selected' : ''}>Read & Annotated</option>
+                    <option value="Synthesized" ${item.readStatus === 'Synthesized' ? 'selected' : ''}>Synthesized</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-400 font-semibold uppercase mb-0.5">Citation</label>
+                  <select onchange="updateCiteStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1 border w-full ${getCiteStatusStyle(item.citeStatus)}">
+                    <option value="Not Used Yet" ${item.citeStatus === 'Not Used Yet' ? 'selected' : ''}>Not Used Yet</option>
+                    <option value="Drafted" ${item.citeStatus === 'Drafted' ? 'selected' : ''}>Drafted</option>
+                    <option value="Final Cited" ${item.citeStatus === 'Final Cited' ? 'selected' : ''}>Final Cited</option>
+                    <option value="Archive" ${item.citeStatus === 'Archive' ? 'selected' : ''}>Archive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-1">
+                <a href="${item.doi}" target="_blank" rel="noopener noreferrer" class="text-xs text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-link text-[10px]"></i> Source DOI
+                </a>
+                <button onclick="openDetailModal('${item.id}')" class="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1">
+                  Full Details <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPaginationControls(totalPages) {
+      const container = document.getElementById('paginationControls');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `
+        <button onclick="changePage(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled class="opacity-40 cursor-not-allowed"' : 'class="hover:bg-slate-200 dark:hover:bg-slate-700"'} class="px-2 py-1 rounded text-xs">
+          <i class="fa-solid fa-chevron-left text-[10px]"></i>
+        </button>
+      `;
+
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= state.currentPage - 1 && p <= state.currentPage + 1)) {
+          html += `
+            <button onclick="changePage(${p})" class="px-2.5 py-1 rounded text-xs font-medium transition ${state.currentPage === p ? 'bg-brand-600 text-white font-bold' : 'hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'}">
+              ${p}
+            </button>
+          `;
+        } else if (p === state.currentPage - 2 || p === state.currentPage + 2) {
+          html += `<span class="px-1 text-xs text-slate-400">...</span>`;
+        }
+      }
+
+      html += `
+        <button onclick="changePage(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled class="opacity-40 cursor-not-allowed"' : 'class="hover:bg-slate-200 dark:hover:bg-slate-700"'} class="px-2 py-1 rounded text-xs">
+          <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </button>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    window.changePage = function(newPage) {
+      state.currentPage = newPage;
+      renderView();
+    };
+
+    window.toggleSelect = function(id, isChecked) {
+      if (isChecked) {
+        state.selectedIds.add(id);
+      } else {
+        state.selectedIds.delete(id);
+      }
+      updateBulkBar();
+    };
+
+    function updateBulkBar() {
+      const bar = document.getElementById('bulkActionBar');
+      const count = state.selectedIds.size;
+      document.getElementById('selectedCountBadge').textContent = count;
+      document.getElementById('selectedCountText').textContent = count;
+      
+      const selectAll = document.getElementById('selectAllCheckbox');
+      const visible = getProcessedData();
+      if (selectAll) {
+        selectAll.checked = visible.length > 0 && visible.every(item => state.selectedIds.has(item.id));
+      }
+
+      if (count > 0) {
+        bar.classList.remove('hidden');
+      } else {
+        bar.classList.add('hidden');
       }
     }
 
@@ -1174,9 +1486,10 @@ function extractAcademicSynthesis(title, text) {
       const item = state.data.find(r => r.id === id);
       if (item) {
         item.readStatus = newStatus;
+        saveToLocalStorage();
         updateDashboardKPIs();
-        renderTable();
-        showToast(`Updated ${item.citationKey} reading status to "${newStatus}"`);
+        renderView();
+        showToast(`Updated reading status for ${item.citationKey}`);
       }
     };
 
@@ -1184,9 +1497,10 @@ function extractAcademicSynthesis(title, text) {
       const item = state.data.find(r => r.id === id);
       if (item) {
         item.citeStatus = newStatus;
+        saveToLocalStorage();
         updateDashboardKPIs();
-        renderTable();
-        showToast(`Updated ${item.citationKey} citation status to "${newStatus}"`);
+        renderView();
+        showToast(`Updated citation status for ${item.citationKey}`);
       }
     };
 
@@ -1206,7 +1520,7 @@ function extractAcademicSynthesis(title, text) {
       document.getElementById('metricTotalPapers').textContent = total;
       document.getElementById('metricTargetTotal').textContent = total;
       document.getElementById('metricReadPercent').textContent = `${completedPct}% processed`;
-      document.getElementById('metricSynthesizedCount').textContent = `${synthesized} Synthesized`;
+      document.getElementById('metricSynthesizedCount').textContent = `${synthesized} Synth`;
       document.getElementById('metricAnnotatedCount').textContent = `${annotated} Read`;
       document.getElementById('metricUnreadCount').textContent = `${unread} Unread`;
 
@@ -1226,25 +1540,252 @@ function extractAcademicSynthesis(title, text) {
       if (!item) return;
       currentModalPaper = item;
 
-      modalId.textContent = item.id;
-      modalYear.textContent = item.year;
-      modalChapterBadge.textContent = item.chapter;
-      modalTitle.textContent = item.title;
-      modalAuthors.textContent = item.authors;
-      modalApaCitation.textContent = `${item.authors} (${item.year}). ${item.title}. ${item.journal}, ${item.volumePages || ''}. ${item.doi}`;
-      modalFindings.textContent = item.findings || 'No specific findings extracted yet.';
-      modalQuote.textContent = item.quotes || 'No direct quotation marked.';
-      modalRelevance.textContent = item.relevance || 'Relevant to thesis development.';
-      modalVenue.textContent = `${item.journal} ${item.volumePages ? '(' + item.volumePages + ')' : ''}`;
-      modalDoiLink.href = item.doi;
-      modalDoiLink.innerHTML = `<span>${item.doi}</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>`;
+      document.getElementById('modalId').textContent = item.id;
+      document.getElementById('modalYear').textContent = item.year;
+      document.getElementById('modalChapterBadge').textContent = item.chapter;
+      document.getElementById('modalThemeBadge').innerHTML = getThemeBadge(item.theme);
+      document.getElementById('modalTitle').textContent = item.title;
+      document.getElementById('modalAuthors').textContent = item.authors;
+      document.getElementById('modalApaCitation').textContent = formatApaCitation(item);
+      document.getElementById('modalBibtexCode').textContent = formatBibtex(item);
+      document.getElementById('modalFindings').textContent = item.findings || 'No specific findings extracted yet.';
+      document.getElementById('modalQuote').textContent = item.quotes || 'No direct quotation marked.';
+      document.getElementById('modalRelevance').textContent = item.relevance || 'Relevant to thesis development.';
+      document.getElementById('modalVenue').textContent = `${item.journal} ${item.volumePages ? '(' + item.volumePages + ')' : ''}`;
+      
+      const doiLink = document.getElementById('modalDoiLink');
+      doiLink.href = item.doi;
+      doiLink.innerHTML = `<span>${item.doi}</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>`;
 
-      detailModal.classList.remove('hidden');
+      document.getElementById('detailModal').classList.remove('hidden');
     };
 
     function closeDetailModal() {
-      detailModal.classList.add('hidden');
+      document.getElementById('detailModal').classList.add('hidden');
       currentModalPaper = null;
+    }
+
+    window.openEditModal = function(id) {
+      const item = state.data.find(r => r.id === id);
+      if (!item) return;
+
+      closeDetailModal();
+
+      document.getElementById('addModalTitle').innerHTML = `Edit Paper: <span class="text-brand-600 font-mono">${item.id}</span>`;
+      document.getElementById('editPaperId').value = item.id;
+      document.getElementById('inputCiteKey').value = item.citationKey || '';
+      document.getElementById('inputYear').value = item.year || 2025;
+      document.getElementById('inputAuthors').value = item.authors || '';
+      document.getElementById('inputTitle').value = item.title || '';
+      document.getElementById('inputVenue').value = item.journal || '';
+      document.getElementById('inputVolumePages').value = item.volumePages || '';
+      document.getElementById('inputDoi').value = item.doi || '';
+      document.getElementById('inputChapter').value = item.chapter || 'Chapter 2 (Literature Review)';
+      document.getElementById('inputDomain').value = item.theme || 'Information Overload';
+      document.getElementById('inputMethodology').value = item.methodology || '';
+      document.getElementById('inputFindings').value = item.findings || '';
+      document.getElementById('inputRelevance').value = item.relevance || '';
+      document.getElementById('inputQuote').value = item.quotes || '';
+
+      document.getElementById('autoFillBadge').classList.add('hidden');
+      document.getElementById('addModal').classList.remove('hidden');
+    };
+
+    window.promptDelete = function(id) {
+      const item = state.data.find(r => r.id === id);
+      if (!item) return;
+      pendingDeleteId = id;
+      document.getElementById('deleteConfirmText').textContent = `Are you sure you want to permanently remove "${item.citationKey}"?`;
+      document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    };
+
+    async function handleDoiAutoFill() {
+      const quickDoiInput = document.getElementById('quickDoiInput');
+      const fetchBtnText = document.getElementById('fetchBtnText');
+      const fetchSpinner = document.getElementById('fetchSpinner');
+      const fetchDoiBtn = document.getElementById('fetchDoiBtn');
+      const autoFillBadge = document.getElementById('autoFillBadge');
+
+      let rawInput = quickDoiInput ? quickDoiInput.value.trim() : '';
+      if (!rawInput) {
+        showToast("Please enter a valid DOI identifier or URL.");
+        return;
+      }
+
+      const doiPattern = /(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/;
+      const match = rawInput.match(doiPattern);
+      const cleanDoi = match ? match[1] : rawInput;
+
+      fetchBtnText.classList.add('hidden');
+      fetchSpinner.classList.remove('hidden');
+      fetchDoiBtn.disabled = true;
+
+      try {
+        const crRes = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
+        if (!crRes.ok) throw new Error("CrossRef lookup failed. Please verify the DOI.");
+        const crJson = await crRes.json();
+        const crData = crJson.message;
+
+        let paperAbstract = "";
+        let paperTldr = "";
+
+        try {
+          const s2Res = await fetch(`https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(cleanDoi)}?fields=abstract,tldr`);
+          if (s2Res.ok) {
+            const s2Data = await s2Res.json();
+            paperAbstract = s2Data.abstract || "";
+            paperTldr = s2Data.tldr?.text || "";
+          }
+        } catch (e) {}
+
+        if (!paperAbstract && crData.abstract) {
+          paperAbstract = crData.abstract.replace(/<[^>]*>?/gm, '').trim();
+        }
+
+        let authorsList = "Unknown Authors";
+        let firstAuthor = "Author";
+
+        if (Array.isArray(crData.author) && crData.author.length > 0) {
+          firstAuthor = crData.author[0].family || crData.author[0].name || "Author";
+          authorsList = crData.author.map(a => {
+            if (a.name) return a.name;
+            const family = a.family || '';
+            const initial = a.given ? `${a.given.trim()[0]}.` : '';
+            return [family, initial].filter(Boolean).join(', ');
+          }).join(', ');
+        }
+
+        const pubYear = crData["published-print"]?.["date-parts"]?.[0]?.[0] || 
+                        crData["published-online"]?.["date-parts"]?.[0]?.[0] || 
+                        crData["created"]?.["date-parts"]?.[0]?.[0] || 2025;
+
+        const citeKey = crData.author && crData.author.length > 2 
+          ? `${firstAuthor} et al. (${pubYear})` 
+          : `${firstAuthor} (${pubYear})`;
+
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        };
+
+        setVal('inputCiteKey', citeKey);
+        setVal('inputAuthors', authorsList);
+        setVal('inputYear', pubYear);
+        setVal('inputTitle', crData.title?.[0] || "Untitled Article");
+        setVal('inputVenue', crData["container-title"]?.[0] || crData.publisher || "Academic Publication");
+        
+        const vol = crData.volume ? `Vol. ${crData.volume}` : '';
+        const iss = crData.issue ? `No. ${crData.issue}` : '';
+        const pg = crData.page ? `pp. ${crData.page}` : (crData.article_number ? `Art. ${crData.article_number}` : '');
+        setVal('inputVolumePages', [vol, iss, pg].filter(Boolean).join(', '));
+        setVal('inputDoi', `https://doi.org/${cleanDoi}`);
+
+        extractAcademicSynthesis(crData.title?.[0] || "", paperAbstract || paperTldr);
+
+        autoFillBadge.classList.remove('hidden');
+        showToast("Parsed metadata and drafted claims! Review before saving.");
+      } catch (err) {
+        showToast("Could not auto-extract paper. Please enter details manually.");
+      } finally {
+        fetchBtnText.classList.remove('hidden');
+        fetchSpinner.classList.add('hidden');
+        fetchDoiBtn.disabled = false;
+      }
+    }
+
+    function extractAcademicSynthesis(title, text) {
+      const cleanText = (text || '').replace(/<[^>]*>?/gm, '').trim();
+      const content = `${title} ${cleanText}`.toLowerCase();
+
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      };
+
+      let method = "Empirical / Mixed Methods";
+      if (content.includes("survey") || content.includes("pls-sem") || content.includes("questionnaire")) {
+        method = "Quantitative Survey (PLS-SEM)";
+      } else if (content.includes("interview") || content.includes("qualitative") || content.includes("case study")) {
+        method = "Qualitative Thematic Analysis";
+      } else if (content.includes("systematic review") || content.includes("meta-analysis")) {
+        method = "Systematic Literature Review";
+      }
+      setVal('inputMethodology', method);
+
+      if (cleanText.length > 60) {
+        const rawSentences = cleanText.split(/[.?!]\s+/).map(s => s.trim()).filter(Boolean);
+        const keySentence = rawSentences.length > 2 ? rawSentences[rawSentences.length - 2] : rawSentences[0];
+        setVal('inputFindings', keySentence ? `${keySentence}.` : cleanText.slice(0, 160));
+        setVal('inputQuote', keySentence ? `"${keySentence}."` : `"${cleanText.slice(0, 110)}..."`);
+      } else {
+        setVal('inputFindings', `Investigates ${title} in the context of information environments and user interaction.`);
+        setVal('inputQuote', `"[Direct quote regarding key behavioral effect or mechanism]."` );
+      }
+
+      if (content.includes("misinformation") || content.includes("verification") || content.includes("credibility") || content.includes("fake")) {
+        setVal('inputDomain', "Misinformation & Verification");
+        setVal('inputChapter', "Chapter 3 (System Framework)");
+        setVal('inputRelevance', "Validates the necessity of verification badges, authenticity checks, and provenance tracking in the platform architecture.");
+      } else if (content.includes("fandom") || content.includes("k-pop") || content.includes("fan")) {
+        setVal('inputDomain', "K-Pop Fandom & Communities");
+        setVal('inputChapter', "Chapter 2 (Literature Review)");
+        setVal('inputRelevance', "Establishes contextual grounding on fan mobilization, event coordination, and digital trust dynamics in fan communities.");
+      } else if (content.includes("moderation") || content.includes("governance") || content.includes("algorithm")) {
+        setVal('inputDomain', "Platform Moderation & Algorithms");
+        setVal('inputChapter', "Chapter 3 (System Framework)");
+        setVal('inputRelevance', "Provides architecture principles for transparent filtering, community reporting, and post governance.");
+      } else {
+        setVal('inputDomain', "Information Overload");
+        setVal('inputChapter', "Chapter 1 (Problem Statement)");
+        setVal('inputRelevance', "Provides empirical justification for consolidating fragmented social channels into a single centralized dashboard.");
+      }
+    }
+
+    function exportToCSV(datasetToExport) {
+      const targetData = datasetToExport || state.data;
+      const headers = [
+        "ID", "Citation Key", "Authors", "Year", "Title", "Venue", "Volume/Pages", 
+        "DOI", "Thematic Domain", "Methodology", "Key Findings", "Project Relevance", 
+        "Citable Quote", "Thesis Chapter", "Reading Status", "Citation Status"
+      ];
+
+      const csvRows = [headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",")];
+
+      targetData.forEach(item => {
+        const row = [
+          item.id, item.citationKey, item.authors, item.year, item.title,
+          item.journal, item.volumePages, item.doi, item.theme, item.methodology,
+          item.findings, item.relevance, item.quotes, item.chapter,
+          item.readStatus, item.citeStatus
+        ];
+        csvRows.push(row.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(","));
+      });
+
+      downloadFile(csvRows.join("\r\n"), `Thesis_Literature_Matrix_${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${targetData.length} references to CSV!`);
+    }
+
+    function exportToBibtex() {
+      const bibEntries = state.data.map(item => formatBibtex(item)).join("\n\n");
+      downloadFile(bibEntries, `Thesis_Bibliography_${new Date().toISOString().slice(0, 10)}.bib`, 'text/plain;charset=utf-8;');
+      showToast(`Exported ${state.data.length} references to BibTeX!`);
+    }
+
+    function exportToJson() {
+      const jsonContent = JSON.stringify(state.data, null, 2);
+      downloadFile(jsonContent, `Thesis_Matrix_Backup_${new Date().toISOString().slice(0, 10)}.json`, 'application/json;charset=utf-8;');
+      showToast("Exported database backup to JSON!");
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     window.copyInTextCitation = function(citationKey) {
@@ -1253,221 +1794,372 @@ function extractAcademicSynthesis(title, text) {
     };
 
     function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
       const textarea = document.createElement('textarea');
       textarea.value = text;
       document.body.appendChild(textarea);
       textarea.select();
-      try {
-        document.execCommand('copy');
-      } catch (err) {
-        console.error('Copy fallback error:', err);
-      }
+      try { document.execCommand('copy'); } catch (err) {}
       document.body.removeChild(textarea);
     }
 
-    function showToast(message) {
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
       toastMsg.textContent = message;
+      toastIcon.className = isError 
+        ? "fa-solid fa-triangle-exclamation text-rose-400 dark:text-rose-600 text-sm"
+        : "fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600 text-sm";
+
       toast.classList.remove('opacity-0', 'translate-y-20');
       toast.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(() => {
+      
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
         toast.classList.remove('opacity-100', 'translate-y-0');
         toast.classList.add('opacity-0', 'translate-y-20');
-      }, 2500);
-    }
-
-    function exportToCSV() {
-      const headers = [
-        "ID", "Citation Key", "Authors", "Year", "Title", "Venue", "Volume/Pages", 
-        "DOI", "Thematic Domain", "Methodology", "Key Findings", "Project Relevance", 
-        "Citable Quote", "Thesis Chapter", "Reading Status", "Citation Status"
-      ];
-
-      const csvRows = [];
-      csvRows.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(","));
-
-      state.data.forEach(item => {
-        const row = [
-          item.id,
-          item.citationKey,
-          item.authors,
-          item.year,
-          item.title,
-          item.journal,
-          item.volumePages,
-          item.doi,
-          item.theme,
-          item.methodology,
-          item.findings,
-          item.relevance,
-          item.quotes,
-          item.chapter,
-          item.readStatus,
-          item.citeStatus
-        ];
-        csvRows.push(row.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(","));
-      });
-
-      const csvString = csvRows.join("\r\n");
-      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Thesis_Literature_Matrix_${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showToast("Literature matrix exported to CSV!");
+      }, 2600);
     }
 
     function setupEventListeners() {
-      // Search
+      const searchInput = document.getElementById('searchInput');
+      const clearSearchBtn = document.getElementById('clearSearchBtn');
+
       searchInput.addEventListener('input', (e) => {
         state.filters.search = e.target.value;
-        renderTable();
+        if (e.target.value) {
+          clearSearchBtn.classList.remove('hidden');
+        } else {
+          clearSearchBtn.classList.add('hidden');
+        }
+        state.currentPage = 1;
+        renderView();
       });
 
-      // Status filters
-      filterReading.addEventListener('change', (e) => {
-        state.filters.readingStatus = e.target.value;
-        renderTable();
-      });
-
-      filterCitation.addEventListener('change', (e) => {
-        state.filters.citationStatus = e.target.value;
-        renderTable();
-      });
-
-      // Reset
-      resetFiltersBtn.addEventListener('click', () => {
+      clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
-        filterReading.value = 'all';
-        filterCitation.value = 'all';
+        state.filters.search = '';
+        clearSearchBtn.classList.add('hidden');
+        renderView();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        } else if (e.key === 'Escape') {
+          closeDetailModal();
+          document.getElementById('addModal').classList.add('hidden');
+          document.getElementById('deleteConfirmModal').classList.add('hidden');
+        }
+      });
+
+      const viewTableBtn = document.getElementById('viewTableBtn');
+      const viewGridBtn = document.getElementById('viewGridBtn');
+
+      viewTableBtn.addEventListener('click', () => {
+        state.viewMode = 'table';
+        viewTableBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-300 shadow-xs";
+        viewGridBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200";
+        renderView();
+      });
+
+      viewGridBtn.addEventListener('click', () => {
+        state.viewMode = 'grid';
+        viewGridBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-300 shadow-xs";
+        viewTableBtn.className = "px-2.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200";
+        renderView();
+      });
+
+      document.getElementById('sortBySelect').addEventListener('change', (e) => {
+        state.sortBy = e.target.value;
+        renderView();
+      });
+
+      document.getElementById('filterReadingStatus').addEventListener('change', (e) => {
+        state.filters.readingStatus = e.target.value;
+        state.currentPage = 1;
+        renderView();
+      });
+
+      document.getElementById('filterCitationStatus').addEventListener('change', (e) => {
+        state.filters.citationStatus = e.target.value;
+        state.currentPage = 1;
+        renderView();
+      });
+
+      document.getElementById('pageSizeSelect').addEventListener('change', (e) => {
+        state.pageSize = e.target.value;
+        state.currentPage = 1;
+        renderView();
+      });
+
+      document.querySelectorAll('.chapter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.chapter-btn').forEach(b => {
+            b.classList.remove('bg-slate-900', 'text-white', 'dark:bg-brand-600', 'shadow-xs');
+            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
+          });
+          btn.classList.add('bg-slate-900', 'text-white', 'dark:bg-brand-600', 'shadow-xs');
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
+          state.filters.chapter = btn.getAttribute('data-filter-chapter');
+          state.currentPage = 1;
+          renderView();
+        });
+      });
+
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.theme-btn').forEach(b => {
+            b.classList.remove('bg-brand-100', 'text-brand-800', 'dark:bg-brand-950', 'dark:text-brand-300', 'border-brand-200', 'dark:border-brand-800', 'font-semibold');
+            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
+          });
+          btn.classList.add('bg-brand-100', 'text-brand-800', 'dark:bg-brand-950', 'dark:text-brand-300', 'border-brand-200', 'dark:border-brand-800', 'font-semibold');
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-800', 'dark:text-slate-300');
+          state.filters.theme = btn.getAttribute('data-filter-theme');
+          state.currentPage = 1;
+          renderView();
+        });
+      });
+
+      document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.classList.add('hidden');
+        document.getElementById('filterReadingStatus').value = 'all';
+        document.getElementById('filterCitationStatus').value = 'all';
+        document.getElementById('sortBySelect').value = 'id-asc';
+        
         state.filters.search = '';
         state.filters.theme = 'all';
         state.filters.chapter = 'all';
         state.filters.readingStatus = 'all';
         state.filters.citationStatus = 'all';
+        state.sortBy = 'id-asc';
+        state.currentPage = 1;
 
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-          btn.classList.remove('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
-          btn.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-        });
-        document.querySelector('[data-filter-theme="all"]').classList.add('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
+        document.querySelector('[data-filter-chapter="all"]').click();
+        document.querySelector('[data-filter-theme="all"]').click();
 
-        document.querySelectorAll('.chapter-btn').forEach(btn => {
-          btn.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-600');
-          btn.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-        });
-        document.querySelector('[data-filter-chapter="all"]').classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-600');
-
-        renderTable();
         showToast("Filters reset to default.");
       });
 
-      // Chapter Filter Buttons
-      document.querySelectorAll('.chapter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.chapter-btn').forEach(b => {
-            b.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-600');
-            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-          });
-          btn.classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-600');
-          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-          state.filters.chapter = btn.getAttribute('data-filter-chapter');
-          renderTable();
+      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (e) => {
+          const visible = getProcessedData();
+          if (e.target.checked) {
+            visible.forEach(item => state.selectedIds.add(item.id));
+          } else {
+            visible.forEach(item => state.selectedIds.delete(item.id));
+          }
+          renderView();
         });
+      }
+
+      document.getElementById('bulkDeselectBtn').addEventListener('click', () => {
+        state.selectedIds.clear();
+        renderView();
       });
 
-      // Thematic Pill Buttons
-      document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.theme-btn').forEach(b => {
-            b.classList.remove('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
-            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-          });
-          btn.classList.add('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
-          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
-          state.filters.theme = btn.getAttribute('data-filter-theme');
-          renderTable();
+      document.getElementById('bulkMarkReadBtn').addEventListener('click', () => {
+        state.selectedIds.forEach(id => {
+          const item = state.data.find(r => r.id === id);
+          if (item) item.readStatus = 'Read & Annotated';
         });
+        saveToLocalStorage();
+        updateDashboardKPIs();
+        renderView();
+        showToast(`Marked ${state.selectedIds.size} papers as Read & Annotated.`);
       });
 
-      // CSV Export
-      exportCsvBtn.addEventListener('click', exportToCSV);
-
-      // Dark / Light Toggle
-      themeToggleBtn.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
+      document.getElementById('bulkMarkCitedBtn').addEventListener('click', () => {
+        state.selectedIds.forEach(id => {
+          const item = state.data.find(r => r.id === id);
+          if (item) item.citeStatus = 'Final Cited';
+        });
+        saveToLocalStorage();
+        updateDashboardKPIs();
+        renderView();
+        showToast(`Marked ${state.selectedIds.size} papers as Final Cited.`);
       });
 
-      // Add Modal Open/Close
-      openAddModalBtn.addEventListener('click', () => {
+      document.getElementById('bulkExportCsvBtn').addEventListener('click', () => {
+        const selectedData = state.data.filter(r => state.selectedIds.has(r.id));
+        exportToCSV(selectedData);
+      });
+
+      const exportDropdownBtn = document.getElementById('exportDropdownBtn');
+      const exportDropdownMenu = document.getElementById('exportDropdownMenu');
+
+      exportDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportDropdownMenu.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', () => {
+        exportDropdownMenu.classList.add('hidden');
+      });
+
+      document.getElementById('exportCsvBtn').addEventListener('click', () => exportToCSV());
+      document.getElementById('exportBibtexBtn').addEventListener('click', exportToBibtex);
+      document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
+
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('thesis_matrix_theme', isDark ? 'dark' : 'light');
+      });
+
+      const addModal = document.getElementById('addModal');
+      const addRefForm = document.getElementById('addRefForm');
+
+      document.getElementById('openAddModalBtn').addEventListener('click', () => {
         addRefForm.reset();
-        quickDoiInput.value = '';
-        autoFillBadge.classList.add('hidden');
+        document.getElementById('editPaperId').value = '';
+        document.getElementById('quickDoiInput').value = '';
+        document.getElementById('autoFillBadge').classList.add('hidden');
+        document.getElementById('addModalTitle').innerHTML = `Add Literature via DOI Auto-Fill`;
         addModal.classList.remove('hidden');
       });
-      closeAddModalBtn.addEventListener('click', () => addModal.classList.add('hidden'));
-      cancelAddBtn.addEventListener('click', () => addModal.classList.add('hidden'));
 
-      // DOI Auto-Fill Button Click
-      fetchDoiBtn.addEventListener('click', handleDoiAutoFill);
-      quickDoiInput.addEventListener('keydown', (e) => {
+      document.getElementById('closeAddModalBtn').addEventListener('click', () => addModal.classList.add('hidden'));
+      document.getElementById('cancelAddBtn').addEventListener('click', () => addModal.classList.add('hidden'));
+
+      document.getElementById('fetchDoiBtn').addEventListener('click', handleDoiAutoFill);
+      document.getElementById('quickDoiInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
           handleDoiAutoFill();
         }
       });
 
-      // Detail Modal Closers
-      closeModalBtn.addEventListener('click', closeDetailModal);
-      modalDismissBottom.addEventListener('click', closeDetailModal);
-      detailModal.addEventListener('click', (e) => {
-        if (e.target === detailModal) closeDetailModal();
+      document.getElementById('closeModalBtn').addEventListener('click', closeDetailModal);
+      document.getElementById('modalDismissBottom').addEventListener('click', closeDetailModal);
+      document.getElementById('detailModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('detailModal')) closeDetailModal();
       });
 
-      // Copy APA Citation from Modal
-      copyApaBtn.addEventListener('click', () => {
+      document.getElementById('copyApaBtn').addEventListener('click', () => {
         if (currentModalPaper) {
-          const fullApa = `${currentModalPaper.authors} (${currentModalPaper.year}). ${currentModalPaper.title}. ${currentModalPaper.journal}, ${currentModalPaper.volumePages || ''}. ${currentModalPaper.doi}`;
-          copyToClipboard(fullApa);
-          showToast(`Copied complete APA 7 reference for ${currentModalPaper.citationKey}`);
+          copyToClipboard(formatApaCitation(currentModalPaper));
+          showToast(`Copied APA reference for ${currentModalPaper.citationKey}`);
         }
       });
 
-      // Add Reference Form Submit (Save to Sheets)
+      document.getElementById('copyBibtexModalBtn').addEventListener('click', () => {
+        if (currentModalPaper) {
+          copyToClipboard(formatBibtex(currentModalPaper));
+          showToast(`Copied BibTeX snippet for ${currentModalPaper.citationKey}`);
+        }
+      });
+
+      document.getElementById('modalEditBtn').addEventListener('click', () => {
+        if (currentModalPaper) openEditModal(currentModalPaper.id);
+      });
+
+      document.getElementById('modalDeleteBtn').addEventListener('click', () => {
+        if (currentModalPaper) promptDelete(currentModalPaper.id);
+      });
+
+      document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+        document.getElementById('deleteConfirmModal').classList.add('hidden');
+        pendingDeleteId = null;
+      });
+
+      document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        if (pendingDeleteId) {
+          const index = state.data.findIndex(r => r.id === pendingDeleteId);
+          if (index !== -1) {
+            const removed = state.data.splice(index, 1)[0];
+            state.selectedIds.delete(pendingDeleteId);
+            saveToLocalStorage();
+            updateDashboardKPIs();
+            renderView();
+            showToast(`Deleted ${removed.citationKey}`);
+          }
+          pendingDeleteId = null;
+          document.getElementById('deleteConfirmModal').classList.add('hidden');
+          closeDetailModal();
+        }
+      });
+
+      document.getElementById('restoreDefaultDatasetBtn').addEventListener('click', () => {
+        if (confirm("Restore the default 25 research studies? (Any unsaved additions will be overwritten)")) {
+          state.data = [...initialDefaultDataset];
+          saveToLocalStorage();
+          updateDashboardKPIs();
+          renderView();
+          showToast("Restored initial 25 literature papers.");
+        }
+      });
+
+      document.getElementById('forceSyncCloudBtn').addEventListener('click', () => {
+        loadCloudReferences();
+      });
+
       addRefForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const nextIndex = state.data.length + 1;
+        const editId = document.getElementById('editPaperId').value;
+        
+        let targetId = editId;
+        if (!targetId) {
+          const maxNum = state.data.reduce((max, r) => {
+            const num = parseInt(r.id.replace('REF-', ''), 10);
+            return !isNaN(num) && num > max ? num : max;
+          }, 0);
+          targetId = `REF-${String(maxNum + 1).padStart(2, '0')}`;
+        }
+
         const newRefData = {
-          id: `REF-${String(nextIndex).padStart(2, '0')}`,
-          citationKey: document.getElementById('inputCiteKey').value,
-          authors: document.getElementById('inputAuthors').value,
+          id: targetId,
+          citationKey: document.getElementById('inputCiteKey').value.trim(),
+          authors: document.getElementById('inputAuthors').value.trim(),
           year: parseInt(document.getElementById('inputYear').value, 10) || 2025,
-          title: document.getElementById('inputTitle').value,
-          journal: document.getElementById('inputVenue').value || 'Journal Article',
-          volumePages: document.getElementById('inputVolumePages').value || '',
-          doi: document.getElementById('inputDoi').value || '#',
+          title: document.getElementById('inputTitle').value.trim(),
+          journal: document.getElementById('inputVenue').value.trim() || 'Academic Journal',
+          volumePages: document.getElementById('inputVolumePages').value.trim() || '',
+          doi: document.getElementById('inputDoi').value.trim() || '#',
           theme: document.getElementById('inputDomain').value,
-          methodology: document.getElementById('inputMethodology').value || 'Empirical',
-          findings: document.getElementById('inputFindings').value || '',
-          relevance: document.getElementById('inputRelevance').value || '',
-          quotes: document.getElementById('inputQuote').value || '',
+          methodology: document.getElementById('inputMethodology').value.trim() || 'Empirical',
+          findings: document.getElementById('inputFindings').value.trim() || '',
+          relevance: document.getElementById('inputRelevance').value.trim() || '',
+          quotes: document.getElementById('inputQuote').value.trim() || '',
           chapter: document.getElementById('inputChapter').value,
-          readStatus: 'Unread',
-          citeStatus: 'Not Used Yet'
+          readStatus: editId ? (state.data.find(r => r.id === editId)?.readStatus || 'Unread') : 'Unread',
+          citeStatus: editId ? (state.data.find(r => r.id === editId)?.citeStatus || 'Not Used Yet') : 'Not Used Yet'
         };
 
-        await submitNewReference(newRefData);
+        if (editId) {
+          const idx = state.data.findIndex(r => r.id === editId);
+          if (idx !== -1) {
+            state.data[idx] = newRefData;
+            showToast(`Updated "${newRefData.citationKey}"`);
+          }
+        } else {
+          state.data.unshift(newRefData);
+          showToast(`Added "${newRefData.citationKey}"`);
+          submitReferenceToCloud(newRefData);
+        }
+
+        saveToLocalStorage();
+        updateDashboardKPIs();
+        renderView();
         addRefForm.reset();
         addModal.classList.add('hidden');
       });
     }
 
-    // Launch app once loaded
     window.addEventListener('DOMContentLoaded', () => {
       setupEventListeners();
-      loadReferences();
+      initializeData();
     });
   </script>
 </body>
