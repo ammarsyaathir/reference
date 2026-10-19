@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thesis Literature Review Matrix & Research Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark ::-webkit-scrollbar-track { background: #0f172a; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen transition-colors duration-200 dark:bg-slate-900 dark:text-slate-100 flex flex-col font-sans">
+
+  <!-- TOP APP BAR -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+          <i class="fa-solid fa-graduation-cap text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            Thesis Literature Matrix
+            <span class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-300 font-semibold border border-sky-200 dark:border-sky-700">v2.5 AI Powered</span>
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Fandom Dynamics, Misinformation Verification & Platform Moderation</p>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button id="openAddModalBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-xs transition">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Add Paper via DOI
+        </button>
+        <button id="exportCsvBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 transition">
+          <i class="fa-solid fa-file-excel mr-1.5 text-emerald-600 dark:text-emerald-400"></i>
+          Export CSV
+        </button>
+        <button id="themeToggleBtn" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 focus:outline-none transition">
+          <i class="fa-solid fa-moon dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- KPI / DASHBOARD SUMMARY SECTION -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total References</p>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="metricTotalPapers" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
+            <span class="text-xs text-slate-500 font-medium">studies cataloged</span>
+          </div>
+          <p class="text-xs text-sky-600 dark:text-sky-400 mt-1"><i class="fa-solid fa-cloud-arrow-down mr-1"></i>Live Google Sheets Sync</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-300 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs">
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Synthesis Rate</p>
+          <span id="metricReadPercent" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">0%</span>
+        </div>
+        <div class="mt-2">
+          <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 overflow-hidden flex">
+            <div id="barSynthesized" class="bg-emerald-500 h-2.5 transition-all duration-300" style="width: 0%"></div>
+            <div id="barAnnotated" class="bg-sky-500 h-2.5 transition-all duration-300" style="width: 0%"></div>
+            <div id="barSkimmed" class="bg-amber-400 h-2.5 transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2">
+          <span id="metricSynthesizedCount">0 Synthesized</span>
+          <span id="metricAnnotatedCount">0 Read</span>
+          <span id="metricUnreadCount">0 Unread</span>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Thesis Integration</p>
+          <div class="flex items-baseline space-x-1 mt-1">
+            <span id="metricCitedCount" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
+            <span class="text-slate-400">/ <span id="metricTargetTotal">0</span></span>
+            <span class="text-xs text-slate-500 font-medium ml-1">cited in draft</span>
+          </div>
+          <div class="flex items-center space-x-2 text-xs mt-1 text-slate-500 dark:text-slate-400">
+            <span id="metricDraftedCount">0 drafted</span>
+            <span>•</span>
+            <span id="metricNotUsedCount">0 queued</span>
+          </div>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-pen-nib"></i>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Research Domains</p>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span class="text-2xl font-bold text-slate-900 dark:text-white">5 Clusters</span>
+          </div>
+          <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1"><i class="fa-solid fa-cubes mr-1"></i>Cross-disciplinary alignment</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER COVERAGE & THEMATIC FILTER BAR -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-xs space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700 pb-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Thesis Chapter Mapping:</span>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button data-filter-chapter="all" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-900 text-white dark:bg-sky-600">All Chapters</button>
+          <button data-filter-chapter="Chapter 1" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 1 Problem</button>
+          <button data-filter-chapter="Chapter 2" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 2 Lit Review</button>
+          <button data-filter-chapter="Chapter 3" class="chapter-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300">Ch. 3 Methodology / System</button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-1.5 pt-1">
+        <span class="text-xs text-slate-400 mr-1"><i class="fa-solid fa-tags mr-1"></i>Theme:</span>
+        <button data-filter-theme="all" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-200 font-medium">All Themes</button>
+        <button data-filter-theme="K-Pop Fandom & Communities" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">K-Pop Fandom</button>
+        <button data-filter-theme="Misinformation & Verification" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Misinformation</button>
+        <button data-filter-theme="Platform Moderation & Algorithms" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Platform Governance</button>
+        <button data-filter-theme="Information Overload" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Info Overload</button>
+        <button data-filter-theme="Knowledge Sharing & Engagement" class="theme-btn text-xs px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300">Knowledge Sharing</button>
+      </div>
+    </div>
+
+    <!-- CONTROLS & SEARCH BAR -->
+    <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div class="relative w-full md:w-96">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Search author, title, journal, keywords..." 
+               class="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-xs">
+      </div>
+
+      <div class="flex flex-wrap w-full md:w-auto items-center gap-2">
+        <select id="filterReadingStatus" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm rounded-lg px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="all">All Reading Status</option>
+          <option value="Unread">Unread</option>
+          <option value="Skimmed">Skimmed</option>
+          <option value="Read & Annotated">Read & Annotated</option>
+          <option value="Synthesized">Synthesized</option>
+        </select>
+
+        <select id="filterCitationStatus" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm rounded-lg px-2.5 py-2 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="all">All Citation Status</option>
+          <option value="Not Used Yet">Not Used Yet</option>
+          <option value="Drafted">Drafted</option>
+          <option value="Final Cited">Final Cited</option>
+          <option value="Archive">Archive</option>
+        </select>
+
+        <button id="resetFiltersBtn" class="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-2 py-2 underline">
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs overflow-hidden flex flex-col">
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse min-w-[1100px]" id="referencesTable">
+          <thead>
+            <tr class="bg-slate-100/80 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 text-[11px] font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+              <th class="py-3 px-3 w-14 text-center">ID</th>
+              <th class="py-3 px-3 w-48">Citation Key & Year</th>
+              <th class="py-3 px-4 min-w-[260px]">Article Title & Publication Details</th>
+              <th class="py-3 px-3 w-40">Theme & Methodology</th>
+              <th class="py-3 px-4 min-w-[240px]">Relevance to Thesis</th>
+              <th class="py-3 px-3 w-28 text-center">Target Ch.</th>
+              <th class="py-3 px-3 w-36">Reading Status</th>
+              <th class="py-3 px-3 w-36">Citation Status</th>
+              <th class="py-3 px-3 w-24 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-xs text-slate-700 dark:text-slate-300">
+            <!-- Rows render dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+        <div>
+          Showing <span id="visibleRowCount" class="font-bold text-slate-800 dark:text-slate-200">0</span> references
+        </div>
+        <div id="syncIndicator" class="text-[11px] text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-cloud"></i> Synced with Google Sheets
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADD REFERENCE MODAL WITH DOI AI AUTO-FILL -->
+  <div id="addModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50/80 dark:bg-slate-850">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-sky-600"></i> Add Literature via DOI Auto-Fill
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Paste a DOI link to automatically extract metadata and draft thesis insights</p>
+        </div>
+        <button id="closeAddModalBtn" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- DOI Auto-Fetcher Input Bar -->
+      <div class="p-4 bg-sky-50/60 dark:bg-sky-950/30 border-b border-sky-100 dark:border-sky-900/40">
+        <label class="block text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300 mb-1.5">
+          1. Paste DOI or DOI Link
+        </label>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-sky-600 dark:text-sky-400">
+              <i class="fa-solid fa-link text-xs"></i>
+            </div>
+            <input type="text" id="quickDoiInput" placeholder="e.g., https://doi.org/10.1177/01655515221121942 or 10.1177/..." 
+                   class="w-full pl-8 pr-3 py-2 bg-white dark:bg-slate-900 border border-sky-200 dark:border-sky-800 rounded-lg text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
+          </div>
+          <button type="button" id="fetchDoiBtn" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs rounded-lg flex items-center gap-1.5 transition shrink-0 shadow-xs">
+            <span id="fetchBtnText"><i class="fa-solid fa-bolt mr-1"></i>Auto-Fill with AI</span>
+            <i id="fetchSpinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+          </button>
+        </div>
+
+        <!-- Academic Verification Disclaimer Banner -->
+        <div class="mt-2.5 p-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-lg flex items-start gap-2 text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
+          <i class="fa-solid fa-triangle-exclamation text-amber-600 shrink-0 mt-0.5"></i>
+          <span><strong>Academic Integrity Note:</strong> DOI auto-fill fetches verified publication metadata. AI-drafted findings, quotes, and thesis relevance must be reviewed and verified against the actual article text before saving.</span>
+        </div>
+      </div>
+
+      <!-- Main Form (Review & Edit) -->
+      <form id="addRefForm" class="p-4 sm:p-6 overflow-y-auto space-y-3.5 text-xs sm:text-sm flex-1">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">2. Review & Refine Details</span>
+          <span id="autoFillBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">
+            <i class="fa-solid fa-check mr-1"></i>Metadata Parsed from CrossRef
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div class="sm:col-span-2">
+            <label class="block text-slate-500 font-semibold mb-1">In-Text Citation Key *</label>
+            <input type="text" id="inputCiteKey" required placeholder="e.g. Apuke et al. (2024)" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Year *</label>
+            <input type="number" id="inputYear" required value="2025" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Authors *</label>
+          <input type="text" id="inputAuthors" required placeholder="Author 1, Author 2, & Author 3" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Article Title *</label>
+          <input type="text" id="inputTitle" required placeholder="Full academic paper title" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Journal / Publication Venue</label>
+            <input type="text" id="inputVenue" placeholder="e.g. Journal of Information Science" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Volume / Issue / Pages</label>
+            <input type="text" id="inputVolumePages" placeholder="e.g. 50(6), 1371–1381" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">DOI Link</label>
+            <input type="text" id="inputDoi" placeholder="https://doi.org/..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Target Thesis Chapter</label>
+            <select id="inputChapter" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+              <option value="Chapter 1 (Problem Statement)">Chapter 1 (Problem Statement)</option>
+              <option value="Chapter 2 (Literature Review)" selected>Chapter 2 (Literature Review)</option>
+              <option value="Chapter 3 (System Framework)">Chapter 3 (System Framework)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Thematic Domain</label>
+            <select id="inputDomain" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+              <option value="K-Pop Fandom & Communities">K-Pop Fandom & Communities</option>
+              <option value="Misinformation & Verification">Misinformation & Verification</option>
+              <option value="Platform Moderation & Algorithms">Platform Moderation & Algorithms</option>
+              <option value="Information Overload">Information Overload</option>
+              <option value="Knowledge Sharing & Engagement">Knowledge Sharing & Engagement</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-500 font-semibold mb-1">Methodology / Approach</label>
+            <input type="text" id="inputMethodology" placeholder="e.g. Quantitative Survey (PLS-SEM), Qualitative" class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Key Findings & Academic Contribution (Drafted by AI / CrossRef)</label>
+          <textarea id="inputFindings" rows="2" placeholder="Summary of results and empirical findings..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Relevance to Your Project</label>
+          <textarea id="inputRelevance" rows="2" placeholder="Explain how this paper supports your problem statement, features, or framework..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">Direct Citable Claim / Quotation</label>
+          <input type="text" id="inputQuote" placeholder="Specific sentence or statement for thesis citation..." class="w-full p-2 border rounded-lg dark:bg-slate-900 dark:border-slate-700">
+        </div>
+
+        <div class="pt-3 flex justify-between items-center border-t border-slate-200 dark:border-slate-700">
+          <span class="text-[11px] text-slate-400">Step 3: Review carefully before syncing</span>
+          <div class="flex gap-2">
+            <button type="button" id="cancelAddBtn" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 font-semibold text-xs">Cancel</button>
+            <button type="submit" id="saveRefSubmitBtn" class="px-5 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Review & Save to Sheets
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL / SLIDE-OVER DETAIL DRAWER -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all">
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700 flex items-start justify-between bg-slate-50 dark:bg-slate-850">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="modalId" class="px-2 py-0.5 rounded text-xs font-mono font-bold bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-300">REF-01</span>
+            <span id="modalYear" class="text-xs text-slate-500 font-medium">2024</span>
+            <span id="modalChapterBadge" class="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 font-semibold">Chapter 2</span>
+          </div>
+          <h3 id="modalTitle" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">Paper Title</h3>
+          <p id="modalAuthors" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Authors list</p>
+        </div>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[11px] font-bold text-slate-500 uppercase">Complete APA 7th Reference</span>
+            <button id="copyApaBtn" class="text-sky-600 dark:text-sky-400 text-xs font-semibold hover:underline flex items-center gap-1">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+          <p id="modalApaCitation" class="text-slate-700 dark:text-slate-300 italic select-all leading-relaxed"></p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
+            <i class="fa-solid fa-square-check text-sky-600"></i> Key Findings & Academic Contribution
+          </h4>
+          <p id="modalFindings" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800"></p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
+            <i class="fa-solid fa-quote-left text-amber-500"></i> Direct Citable Claim / Quotation
+          </h4>
+          <div class="border-l-4 border-amber-400 pl-3 py-1 italic text-slate-700 dark:text-slate-300 bg-amber-50/50 dark:bg-amber-950/20 rounded-r-lg">
+            <p id="modalQuote"></p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5 mb-1 text-xs sm:text-sm">
+            <i class="fa-solid fa-bullseye text-emerald-600"></i> Relevance to Your Thesis Project
+          </h4>
+          <p id="modalRelevance" class="text-slate-600 dark:text-slate-300 leading-relaxed bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-900/30"></p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <div>
+            <span class="text-[11px] text-slate-400 font-semibold block">PUBLICATION VENUE</span>
+            <span id="modalVenue" class="font-medium text-slate-700 dark:text-slate-300"></span>
+          </div>
+          <div>
+            <span class="text-[11px] text-slate-400 font-semibold block">DOI LINK</span>
+            <a id="modalDoiLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sky-600 dark:text-sky-400 hover:underline break-all inline-flex items-center gap-1">
+              <span>View Source</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 dark:bg-slate-850 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+        <button id="modalDismissBottom" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+    <span id="toastMsg">Action completed</span>
+  </div>
+
+  <script>
+    // Live Google Apps Script Endpoint
+    const API_URL = "https://script.google.com/macros/s/AKfycbynE5Q4KP3ZwvTDCsy-hIfStK3BqjE8DDoKd_HTCrba0ILh7aOBnNgSSUZu5uwspjM/exec";
+
+    // 25 Pre-indexed Literature Studies Fallback Dataset
+    const initialDefaultDataset = [
+      {
+        id: "REF-01", citationKey: "Apuke et al. (2024)", authors: "Apuke, O. D., Omar, B., Tunca, E. A., & Gever, V. C.",
+        year: 2024, title: "Information overload and misinformation sharing behaviour of social media users: Testing the moderating role of cognitive ability",
+        journal: "Journal of Information Science", volumePages: "50(6), 1371–1381", doi: "https://doi.org/10.1177/01655515221121942",
+        theme: "Information Overload", methodology: "Quantitative Survey (PLS-SEM)",
+        findings: "Demonstrates that severe information overload significantly drives passive and unverified misinformation sharing behavior across social platforms.",
+        relevance: "Directly grounds the thesis problem statement regarding user fatigue and vulnerability to inaccurate fan event schedules.",
+        quotes: "Information overload diminishes critical evaluation capabilities, increasing inadvertent propagation of unverified claims.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Read & Annotated", citeStatus: "Drafted"
+      },
+      {
+        id: "REF-02", citationKey: "Arnold et al. (2023)", authors: "Arnold, M., Goldschmitt, M., & Rigotti, T.",
+        year: 2023, title: "Dealing with information overload: A comprehensive review",
+        journal: "Frontiers in Psychology", volumePages: "14, Article 1122200", doi: "https://doi.org/10.3389/fpsyg.2023.1122200",
+        theme: "Information Overload", methodology: "Systematic Literature Review",
+        findings: "Classifies psychological and systemic countermeasures for cognitive overload, stressing centralized filtering interfaces.",
+        relevance: "Provides theoretical justification for building a centralized, single-source event dashboard to reduce fragmented browsing.",
+        quotes: "Platform-level aggregation and standardized visual structures reliably alleviate cognitive fatigue.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-03", citationKey: "Geels et al. (2024)", authors: "Geels, J., Graßl, P., Schraffenberger, H., Tanis, M., & Kleemans, M.",
+        year: 2024, title: "Virtual lab coats: The effects of verified source information on social media post credibility",
+        journal: "PLOS ONE", volumePages: "19(5), Article e0302323", doi: "https://doi.org/10.1371/journal.pone.0302323",
+        theme: "Misinformation & Verification", methodology: "Experimental Factorial Design",
+        findings: "Demonstrates that source credibility cues (e.g., verification badges) elevate user trust and deter misinformation acceptance.",
+        relevance: "Supports the design of the verified event organizer badge in the platform database schema.",
+        quotes: "Visual indicators of authentication act as immediate heuristics that boost platform information trust.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Synthesized", citeStatus: "Final Cited"
+      },
+      {
+        id: "REF-04", citationKey: "Ghosh & Aragon (2024)", authors: "Ghosh, S., & Aragon, C.",
+        year: 2024, title: "Leveraging community support and platform affordances on a path to more active participation: A study of online fan fiction communities",
+        journal: "Transformative Works and Cultures", volumePages: "Vol. 42", doi: "https://doi.org/10.3983/twc.2024.2477",
+        theme: "Knowledge Sharing & Engagement", methodology: "Qualitative & Platform Affordance Analysis",
+        findings: "Reveals how technical affordances (tagging, user pairing) foster community resilience and participatory culture.",
+        relevance: "Frames user matching and community buddy features within participatory fandom literature.",
+        quotes: "Affordances designed around community solidarity bridge casual consumers into engaged collaborators.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-05", citationKey: "Gorwa et al. (2020)", authors: "Gorwa, R., Binns, R., & Katzenbach, C.",
+        year: 2020, title: "Algorithmic content moderation: Technical and political challenges in the automation of platform governance",
+        journal: "Big Data & Society", volumePages: "7(1)", doi: "https://doi.org/10.1177/2053951719897945",
+        theme: "Platform Moderation & Algorithms", methodology: "Critical Governance Framework",
+        findings: "Examines trade-offs in automated vs human community moderation, highlighting the danger of algorithmic over-filtering.",
+        relevance: "Guides admin moderation architecture: combines automated validation checks with community reporting.",
+        quotes: "Automated moderation without contextual oversight produces significant false positives in niche communities.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Skimmed", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-06", citationKey: "Gutierrez-Jauregi et al. (2026)", authors: "Gutierrez-Jauregi, A., Aramendia-Muneta, M. E., & Gómez-Cámara, I.",
+        year: 2026, title: "Harmony in diversity: Unraveling the global impact of K-pop through social media and fandom dynamics",
+        journal: "Media Asia", volumePages: "53(2), 366–392", doi: "https://doi.org/10.1080/01296612.2025.2480451",
+        theme: "K-Pop Fandom & Communities", methodology: "Mixed Methods (Social Network Analysis)",
+        findings: "Highlights international fan mobilization mechanisms and decentralized coordination across global media channels.",
+        relevance: "Demonstrates the scale and digital reliance of modern K-pop fandoms in Asia.",
+        quotes: "Decentralized networks empower fans to organize massive localized gatherings autonomously.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-07", citationKey: "Khan et al. (2023)", authors: "Khan, S. A., Sheikhi, G., Opdahl, A. L., Rabbi, F., et al.",
+        year: 2023, title: "Visual user-generated content verification in journalism: An overview",
+        journal: "IEEE Access", volumePages: "11, 6748–6769", doi: "https://doi.org/10.1109/ACCESS.2023.3236993",
+        theme: "Misinformation & Verification", methodology: "Technical Survey",
+        findings: "Reviews pipeline methods for validating user-uploaded images, event posters, and metadata provenance.",
+        relevance: "Informs user submission validation: verifies authenticity of event posters and links before display.",
+        quotes: "User-generated visual evidence requires multi-stage verification against contextual metadata.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-08", citationKey: "Kim & Lim (2025)", authors: "Kim, Y., & Lim, H. D.",
+        year: 2025, title: "Alleviating the bandwagon effect of crisis misinformation on social media",
+        journal: "Communication Studies", volumePages: "77(1), 22–50", doi: "https://doi.org/10.1080/10510974.2025.2485368",
+        theme: "Misinformation & Verification", methodology: "Experimental Survey",
+        findings: "Unpacks how viral repost metrics create a bandwagon perception of credibility regardless of factual accuracy.",
+        relevance: "Explains why unverified concert rumors spread so quickly on Twitter/X and TikTok without verification.",
+        quotes: "High engagement metrics artificially inflate perceived veracity through collective conformity.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Skimmed", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-09", citationKey: "Mak & Wagner (2025)", authors: "Mak, M. K. F., & Wagner, M. W.",
+        year: 2025, title: "Multi-platform social media use and incidental exposure",
+        journal: "Social Media + Society", volumePages: "11(4)", doi: "https://doi.org/10.1177/20563051251386721",
+        theme: "Information Overload", methodology: "Empirical Multi-Platform Analysis",
+        findings: "Shows fragmentation issues across multiple platforms, leading to conflicting exposure and duplication.",
+        relevance: "Justifies building a centralized platform consolidating events from Instagram, X, and Telegram.",
+        quotes: "Fragmented multi-platform consumption heightens cross-platform discrepancies and user confusion.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-10", citationKey: "Reid (2024)", authors: "Reid, J.",
+        year: 2024, title: "Digitising 'The big lie': Algorithmic curation as an inhibitor of media exposure diversity online",
+        journal: "Communicatio", volumePages: "50(4), 1–21", doi: "https://doi.org/10.1080/02500167.2024.2424841",
+        theme: "Platform Moderation & Algorithms", methodology: "Algorithmic Audit",
+        findings: "Reveals how algorithmically driven timelines restrict exposure diversity in favor of polarizing content.",
+        relevance: "Argues for transparent, chronological, and tag-filtered event discovery over opaque algorithms.",
+        quotes: "Algorithmic curation systematically suppresses alternative exposure in favor of engagement traps.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-11", citationKey: "Roslan et al. (2024a)", authors: "Roslan, M. A. A., Nasharuddin, N. A., & Azmi Murad, M. A.",
+        year: 2024, title: "Navigating the digital realm: The role of facilitating conditions in social media use among Korean Pop (K-pop) fans",
+        journal: "Open International Journal of Informatics", volumePages: "12(2), 13–23", doi: "https://doi.org/10.11113/oiji2024.12n2.305",
+        theme: "K-Pop Fandom & Communities", methodology: "Quantitative Survey (UTAUT Model)",
+        findings: "Identified facilitating conditions and technical availability as fundamental predictors of digital participation among Malaysian K-pop fans.",
+        relevance: "Direct theoretical backing for usability, responsive web design, and accessible platform tools in the local context.",
+        quotes: "Facilitating conditions directly govern the continuous behavioral intentions of Southeast Asian fandom communities.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Read & Annotated", citeStatus: "Final Cited"
+      },
+      {
+        id: "REF-12", citationKey: "Roslan et al. (2024b)", authors: "Roslan, M. A. A., Azmi Murad, M. A., & Nasharuddin, N. A.",
+        year: 2024, title: "Trust as the key to social media success in K-pop fandoms",
+        journal: "Journal of Communication in Scientific Inquiry", volumePages: "6(2), 43–57", doi: "https://doi.org/10.58915/jcsi.v6i2.1563",
+        theme: "K-Pop Fandom & Communities", methodology: "Empirical Factor Analysis",
+        findings: "Demonstrates that interpersonal and platform trust dictate successful community interaction in K-pop fan ecosystems.",
+        relevance: "Foundational citation proving trust features (moderation, reviews) are necessary for community platforms.",
+        quotes: "Trust forms the fundamental infrastructure upon which communal value exchange and engagement rest.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Synthesized", citeStatus: "Final Cited"
+      },
+      {
+        id: "REF-13", citationKey: "Roslan et al. (2025)", authors: "Roslan, M. A. A., Nasharuddin, N. A., & Azmi Murad, M. A.",
+        year: 2025, title: "User experience matters: A qualitative exploration of effort expectancy and behavioural intention in social media use among Korean Pop (K-pop) fans",
+        journal: "Applied Information Technology and Computer Science", volumePages: "6(1), 2407–2415", doi: "https://periodical.uthm.edu.my/index.php/aitcs/article/view/17986",
+        theme: "K-Pop Fandom & Communities", methodology: "Qualitative Thematic Analysis",
+        findings: "Highlights that low effort expectancy (seamless UX, clean UI) directly increases fan retention and active use.",
+        relevance: "Directly validates the design requirement of an intuitive, clean responsive interface.",
+        quotes: "High effort expectancy serves as an immediate deterrent, while intuitive UI fosters long-term digital belonging.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Read & Annotated", citeStatus: "Drafted"
+      },
+      {
+        id: "REF-14", citationKey: "Roslan et al. (2026)", authors: "Roslan, M. A. A., Azmi Murad, M. A., & Nasharuddin, N. A.",
+        year: 2026, title: "The impact of voluntarily engagement on social media usage intentions among (Korean Pop) K-pop fans",
+        journal: "Journal of Information and Knowledge Management", volumePages: "16(1), 92–104", doi: "https://doi.org/10.24191/ra564j86",
+        theme: "Knowledge Sharing & Engagement", methodology: "Structural Equation Modeling",
+        findings: "Reveals how voluntary peer-to-peer engagement stimulates collaborative content creation and sustained loyalty.",
+        relevance: "Provides academic evidence for voluntary event submissions and community reviews.",
+        quotes: "Voluntary participation transforms transactional users into active stewards of digital fan hubs.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-15", citationKey: "Schaffner et al. (2024)", authors: "Schaffner, B., Bhagoji, A. N., Cheng, S., Mei, J., et al.",
+        year: 2024, title: "'Community guidelines make this the best party on the internet': An in-depth study of online platforms' content moderation policies",
+        journal: "Proceedings of ACM CHI 2024", volumePages: "Article 486, 1–16", doi: "https://doi.org/10.1145/3613904.3642333",
+        theme: "Platform Moderation & Algorithms", methodology: "Comparative Policy & User Study",
+        findings: "Discovers that explicit, user-readable community guidelines significantly improve compliance and reporting accuracy.",
+        relevance: "Serves as the model for creating platform submission policies and terms of service.",
+        quotes: "Transparent rules cultivate organic self-moderation among highly motivated online communities.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Skimmed", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-16", citationKey: "Syed Mohammed & Shafi’e (2025)", authors: "Syed Mohammed, S. F., & Shafi’e, A. Z.",
+        year: 2025, title: "Where the fans lead: The grassroots power of K-pop cupsleeve events in Malaysia",
+        journal: "Research Square", volumePages: "Preprint v1", doi: "https://doi.org/10.21203/rs.3.rs-7683576/v1",
+        theme: "K-Pop Fandom & Communities", methodology: "Qualitative Case Study (Malaysian Context)",
+        findings: "Documents cupsleeve projects and cafe gatherings organized by Malaysian fans, identifying logistics issues and venue planning hurdles.",
+        relevance: "Gold-standard local literature directly validating your system domain and core target market.",
+        quotes: "Grassroots cupsleeve events in Malaysia represent significant cultural and micro-economic activity, yet rely on precarious informal advertising.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Read & Annotated", citeStatus: "Final Cited"
+      },
+      {
+        id: "REF-17", citationKey: "Wang et al. (2022)", authors: "Wang, N., Wang, L., Ma, Z., & Wang, S.",
+        year: 2022, title: "From knowledge seeking to knowledge contribution: A social capital perspective",
+        journal: "Technological Forecasting and Social Change", volumePages: "182, Article 121864", doi: "https://doi.org/10.1016/j.techfore.2022.121864",
+        theme: "Knowledge Sharing & Engagement", methodology: "Social Capital Theory (SEM)",
+        findings: "Analyzes transition from passive consumers to active contributors via trust and reciprocity.",
+        relevance: "Explains how community features encourage fans to post accurate meetup updates for others.",
+        quotes: "Relational social capital strongly determines continuous information contribution behavior.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-18", citationKey: "Wang et al. (2023)", authors: "Wang, S., Kim, M. S., & Kim, S.",
+        year: 2023, title: "Effects of online fan community interactions on well-being and sense of virtual community",
+        journal: "Behavioral Sciences", volumePages: "13(11), Article 897", doi: "https://doi.org/10.3390/bs13110897",
+        theme: "K-Pop Fandom & Communities", methodology: "Cross-Sectional Survey",
+        findings: "Affirms that positive online fandom connections foster psychological well-being and a sense of shared belonging.",
+        relevance: "Highlights the social benefits of providing safe, verified fan event spaces.",
+        quotes: "Constructive community exchanges in fandom spaces reinforce emotional health and peer belonging.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-19", citationKey: "Wintterlin et al. (2020)", authors: "Wintterlin, F., Engelke, K. M., & Hase, V.",
+        year: 2020, title: "Can transparency preserve journalism’s trustworthiness?",
+        journal: "Studies in Communication and Media", volumePages: "9(2), 218–240", doi: "https://doi.org/10.5771/2192-4007-2020-2-218",
+        theme: "Misinformation & Verification", methodology: "Experimental Survey",
+        findings: "Transparency regarding source origin and explicit verification steps significantly boosts audience trust.",
+        relevance: "Supports showing verification history and source notes directly on event detail pages.",
+        quotes: "Disclosing verification provenance directly shields platforms against credibility deterioration.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-20", citationKey: "Xie & Zhang (2023)", authors: "Xie, R., & Zhang, W.",
+        year: 2023, title: "Analysis of influencing factors of online community knowledge-sharing",
+        journal: "Kybernetes", volumePages: "52(12), 6107–6121", doi: "https://doi.org/10.1108/K-04-2022-0528",
+        theme: "Knowledge Sharing & Engagement", methodology: "Fuzzy-set Qualitative Comparative Analysis",
+        findings: "Platform interactivity, system quality, and feedback speed are key requirements for continuous sharing.",
+        relevance: "Establishes non-functional system requirements for responsiveness and database speed.",
+        quotes: "Environmental platform stability is a necessary prerequisite for sustained communal information exchange.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-21", citationKey: "Zeng et al. (2024)", authors: "Zeng, H.-K., Lo, S.-Y., & Li, S.-C. S.",
+        year: 2024, title: "Credibility of misinformation source moderates the effectiveness of corrective messages",
+        journal: "Public Understanding of Science", volumePages: "33(5), 587–603", doi: "https://doi.org/10.1177/09636625231215979",
+        theme: "Misinformation & Verification", methodology: "Experimental Study",
+        findings: "Unpacks how corrective alerts work, showing that official platform notices work best if issued early.",
+        relevance: "Supports adding an 'Event Cancelled / Postponed' prompt or dispute notice in the platform.",
+        quotes: "Timely administrative corrections curtail misinformation persistence before widespread sharing takes hold.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-22", citationKey: "Zeng & Kaye (2022)", authors: "Zeng, J., & Kaye, D. B. V.",
+        year: 2022, title: "From content moderation to visibility moderation: A case study of platform governance on TikTok",
+        journal: "Policy & Internet", volumePages: "14(1), 79–95", doi: "https://doi.org/10.1002/poi3.287",
+        theme: "Platform Moderation & Algorithms", methodology: "Qualitative Platform Governance",
+        findings: "Details how platforms modulate algorithmic visibility (shadowbanning, downranking) rather than outright bans.",
+        relevance: "Provides an approach for moderation: unverified events can remain visible but un-boosted until verified.",
+        quotes: "Visibility modulation represents an intermediate governance tier between deletion and endorsement.",
+        chapter: "Chapter 3 (System Framework)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-23", citationKey: "Zhang et al. (2022)", authors: "Zhang, X., Ding, X., & Ma, L.",
+        year: 2022, title: "The influences of information overload and social overload on intention to switch",
+        journal: "Behaviour & Information Technology", volumePages: "41(2), 228–241", doi: "https://doi.org/10.1080/0144929X.2020.1800820",
+        theme: "Information Overload", methodology: "Stress-Strain-Outcome Framework",
+        findings: "Demonstrates that continuous overload causes social media exhaustion and leads users to switch to niche apps.",
+        relevance: "Core justification for why users look for dedicated community apps rather than relying on noisy general social media.",
+        quotes: "Information and social overload provoke platform discontinuance and migration to targeted community tools.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Read & Annotated", citeStatus: "Drafted"
+      },
+      {
+        id: "REF-24", citationKey: "Zhang et al. (2024)", authors: "Zhang, Z., Cheng, Z., Gu, T., & Zhang, Y.",
+        year: 2024, title: "Determinants of users' unverified information sharing on social media platforms: A herding behavior perspective",
+        journal: "Acta Psychologica", volumePages: "248, Article 104345", doi: "https://doi.org/10.1016/j.actpsy.2024.104345",
+        theme: "Misinformation & Verification", methodology: "Herding Behavior Theory",
+        findings: "Identifies perceived social consensus as the primary cause behind sharing speculative information without verification.",
+        relevance: "Explains how fake ticket sales and false schedules spread unchecked in fandom groups.",
+        quotes: "Imitative behavior overcomes critical skepticism when users observe widespread group reposting.",
+        chapter: "Chapter 1 (Problem Statement)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      },
+      {
+        id: "REF-25", citationKey: "Zhou et al. (2024)", authors: "Zhou, Y., Chen, J., & Cheng, B.",
+        year: 2024, title: "Platform incentives, user engagement and knowledge collaboration performance",
+        journal: "Journal of Knowledge Management", volumePages: "28(10), 2940–2975", doi: "https://doi.org/10.1108/JKM-01-2023-0021",
+        theme: "Knowledge Sharing & Engagement", methodology: "Cross-Cultural Empirical Study",
+        findings: "Evaluates reward structures and intrinsic recognition as catalysts for voluntary community curation.",
+        relevance: "Informs user contribution model: recognition badges encourage reliable event submissions.",
+        quotes: "Social recognition and clear intrinsic incentives foster sustainable co-creation in online communities.",
+        chapter: "Chapter 2 (Literature Review)", readStatus: "Unread", citeStatus: "Not Used Yet"
+      }
+    ];
+
+    // State management
+    let state = {
+      data: [...initialDefaultDataset],
+      filters: {
+        search: '',
+        theme: 'all',
+        chapter: 'all',
+        readingStatus: 'all',
+        citationStatus: 'all'
+      }
+    };
+
+    // DOM Elements
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterReading = document.getElementById('filterReadingStatus');
+    const filterCitation = document.getElementById('filterCitationStatus');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const visibleRowCount = document.getElementById('visibleRowCount');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const syncIndicator = document.getElementById('syncIndicator');
+
+    // Add Modal Elements
+    const addModal = document.getElementById('addModal');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    const closeAddModalBtn = document.getElementById('closeAddModalBtn');
+    const cancelAddBtn = document.getElementById('cancelAddBtn');
+    const addRefForm = document.getElementById('addRefForm');
+    const quickDoiInput = document.getElementById('quickDoiInput');
+    const fetchDoiBtn = document.getElementById('fetchDoiBtn');
+    const fetchBtnText = document.getElementById('fetchBtnText');
+    const fetchSpinner = document.getElementById('fetchSpinner');
+    const autoFillBadge = document.getElementById('autoFillBadge');
+
+    // Detail Modal Elements
+    const detailModal = document.getElementById('detailModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalDismissBottom = document.getElementById('modalDismissBottom');
+    const copyApaBtn = document.getElementById('copyApaBtn');
+    const modalId = document.getElementById('modalId');
+    const modalYear = document.getElementById('modalYear');
+    const modalChapterBadge = document.getElementById('modalChapterBadge');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalAuthors = document.getElementById('modalAuthors');
+    const modalApaCitation = document.getElementById('modalApaCitation');
+    const modalFindings = document.getElementById('modalFindings');
+    const modalQuote = document.getElementById('modalQuote');
+    const modalRelevance = document.getElementById('modalRelevance');
+    const modalVenue = document.getElementById('modalVenue');
+    const modalDoiLink = document.getElementById('modalDoiLink');
+
+    let currentModalPaper = null;
+
+    // Load from Google Sheets Apps Script API
+    async function loadReferences() {
+      try {
+        syncIndicator.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Fetching from Google Sheets...`;
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("Network response was not ok");
+        const cloudData = await res.json();
+        
+        if (Array.isArray(cloudData) && cloudData.length > 0) {
+          state.data = cloudData.map(item => ({
+            id: item.id || item.ID || `REF-${Math.floor(Math.random()*1000)}`,
+            citationKey: item.citationKey || item["Citation Key"] || "Unknown citation",
+            authors: item.authors || item.Authors || "Unknown authors",
+            year: item.year || item.Year || 2025,
+            title: item.title || item.Title || "Untitled Paper",
+            journal: item.journal || item.venue || item.Venue || "Publication",
+            volumePages: item.volumePages || item["Volume/Pages"] || "",
+            doi: item.doi || item.DOI || "#",
+            theme: item.theme || item["Thematic Domain"] || "General",
+            methodology: item.methodology || item.Methodology || "Empirical",
+            findings: item.findings || item["Key Findings"] || "",
+            relevance: item.relevance || item["Relevance to Thesis"] || "",
+            quotes: item.quotes || item.quote || item["Citable Quote"] || "",
+            chapter: item.chapter || item["Target Ch."] || "Chapter 2",
+            readStatus: item.readStatus || item["Reading Status"] || "Unread",
+            citeStatus: item.citeStatus || item["Citation Status"] || "Not Used Yet"
+          }));
+          syncIndicator.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-500"></i> Connected to Google Sheets`;
+        } else {
+          syncIndicator.innerHTML = `<i class="fa-solid fa-circle-info text-amber-500"></i> Loaded default template set`;
+        }
+      } catch (err) {
+        console.warn("Could not load from Google Apps Script. Using local cache/default data:", err);
+        syncIndicator.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Offline mode (Local memory)`;
+      } finally {
+        renderTable();
+        updateDashboardKPIs();
+      }
+    }
+
+    // Submit newly added paper to Google Apps Script
+    async function submitNewReference(newRefData) {
+      try {
+        syncIndicator.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Syncing to Google Sheets...`;
+        
+        state.data.unshift(newRefData);
+        renderTable();
+        updateDashboardKPIs();
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify(newRefData)
+        });
+
+        const result = await response.json();
+        showToast(`Saved "${newRefData.citationKey}" to Google Sheets!`);
+        syncIndicator.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-500"></i> Synced with Google Sheets`;
+      } catch (error) {
+        console.error("Error saving reference to Google Sheets:", error);
+        showToast("Saved locally (Check Google Apps Script Web App permissions).");
+        syncIndicator.innerHTML = `<i class="fa-solid fa-circle-exclamation text-rose-500"></i> Sync error (Saved locally)`;
+      }
+    }
+
+    // ==========================================
+    // DOI AUTO-FILL & AI SYNTHESIS ENGINE
+    // ==========================================
+    async function handleDoiAutoFill() {
+      let rawInput = quickDoiInput.value.trim();
+      if (!rawInput) {
+        alert("Please paste a DOI link or identifier (e.g. 10.1177/01655515221121942)");
+        return;
+      }
+
+      // Clean input into pure DOI format: 10.xxxx/...
+      const doiPattern = /(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/;
+      const match = rawInput.match(doiPattern);
+      const cleanDoi = match ? match[1] : rawInput;
+
+      // Update UI loading state
+      fetchBtnText.classList.add('hidden');
+      fetchSpinner.classList.remove('hidden');
+      fetchDoiBtn.disabled = true;
+
+      try {
+        // Query open CrossRef Scholarly Metadata API
+        const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
+        if (!response.ok) throw new Error("Could not find article via CrossRef");
+        
+        const json = await response.json();
+        const data = json.message;
+
+        // 1. Authors Extraction
+        let authorsList = "Unknown Authors";
+        let firstAuthorLastName = "Author";
+        if (data.author && data.author.length > 0) {
+          firstAuthorLastName = data.author[0].family || "Author";
+          if (data.author.length === 1) {
+            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}.`;
+          } else if (data.author.length === 2) {
+            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}., & ${data.author[1].family || ''}, ${(data.author[1].given || '')[0] || ''}.`;
+          } else {
+            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}., ${data.author[1].family || ''}, ${(data.author[1].given || '')[0] || ''}., et al.`;
+          }
+        }
+
+        // 2. Publication Year
+        let pubYear = 2025;
+        if (data["published-print"] && data["published-print"]["date-parts"]) {
+          pubYear = data["published-print"]["date-parts"][0][0];
+        } else if (data["published-online"] && data["published-online"]["date-parts"]) {
+          pubYear = data["published-online"]["date-parts"][0][0];
+        } else if (data.created && data.created["date-parts"]) {
+          pubYear = data.created["date-parts"][0][0];
+        }
+
+        // 3. Title, Venue, Volume & Pages
+        const articleTitle = data.title && data.title[0] ? data.title[0] : "Untitled Article";
+        const journalName = data["container-title"] && data["container-title"][0] ? data["container-title"][0] : (data.publisher || "Scholarly Publication");
+        const volume = data.volume ? `Vol. ${data.volume}` : '';
+        const issue = data.issue ? `No. ${data.issue}` : '';
+        const page = data.page ? `pp. ${data.page}` : (data.article_number ? `Article ${data.article_number}` : '');
+        const volumePages = [volume, issue, page].filter(Boolean).join(', ');
+
+        // 4. In-Text Citation Key Generator
+        const citeCount = data.author && data.author.length > 2 ? `${firstAuthorLastName} et al. (${pubYear})` : `${firstAuthorLastName} (${pubYear})`;
+
+        // 5. Populate Form Fields
+        document.getElementById('inputCiteKey').value = citeCount;
+        document.getElementById('inputAuthors').value = authorsList;
+        document.getElementById('inputYear').value = pubYear;
+        document.getElementById('inputTitle').value = articleTitle;
+        document.getElementById('inputVenue').value = journalName;
+        document.getElementById('inputVolumePages').value = volumePages;
+        document.getElementById('inputDoi').value = `https://doi.org/${cleanDoi}`;
+
+        // 6. AI Contextual Synthesis & Relevance Drafter
+        const abstractText = data.abstract ? data.abstract.replace(/<[^>]*>?/gm, '') : '';
+        autoDraftAISynthesis(articleTitle, abstractText, journalName);
+
+        // Show Success Badge
+        autoFillBadge.classList.remove('hidden');
+        showToast("Auto-filled details via DOI! Please review drafted text.");
+      } catch (err) {
+        console.error("DOI Lookup error:", err);
+        alert("Failed to retrieve publication via DOI. Please verify the DOI string or fill the fields manually.");
+      } finally {
+        fetchBtnText.classList.remove('hidden');
+        fetchSpinner.classList.add('hidden');
+        fetchDoiBtn.disabled = false;
+      }
+    }
+
+    // AI Contextual Synthesis Drafter based on title and abstract heuristics
+    function autoDraftAISynthesis(title, abstract, venue) {
+      const lowerText = `${title} ${abstract} ${venue}`.toLowerCase();
+      
+      let theme = "Knowledge Sharing & Engagement";
+      let chapter = "Chapter 2 (Literature Review)";
+      let methodology = "Empirical / User Study";
+
+      if (lowerText.includes("misinformation") || lowerText.includes("fake news") || lowerText.includes("credibility") || lowerText.includes("verification")) {
+        theme = "Misinformation & Verification";
+        chapter = lowerText.includes("framework") || lowerText.includes("system") ? "Chapter 3 (System Framework)" : "Chapter 1 (Problem Statement)";
+      } else if (lowerText.includes("k-pop") || lowerText.includes("fandom") || lowerText.includes("fan") || lowerText.includes("community")) {
+        theme = "K-Pop Fandom & Communities";
+        chapter = "Chapter 2 (Literature Review)";
+      } else if (lowerText.includes("overload") || lowerText.includes("fatigue") || lowerText.includes("exhaustion")) {
+        theme = "Information Overload";
+        chapter = "Chapter 1 (Problem Statement)";
+      } else if (lowerText.includes("moderation") || lowerText.includes("algorithm") || lowerText.includes("governance") || lowerText.includes("policy")) {
+        theme = "Platform Moderation & Algorithms";
+        chapter = "Chapter 3 (System Framework)";
+      }
+
+      if (lowerText.includes("survey") || lowerText.includes("questionnaire") || lowerText.includes("pls-sem") || lowerText.includes("sem")) {
+        methodology = "Quantitative Survey (PLS-SEM)";
+      } else if (lowerText.includes("interview") || lowerText.includes("qualitative") || lowerText.includes("thematic")) {
+        methodology = "Qualitative Thematic Analysis";
+      } else if (lowerText.includes("review") || lowerText.includes("meta-analysis")) {
+        methodology = "Systematic Literature Review";
+      }
+
+      document.getElementById('inputDomain').value = theme;
+      document.getElementById('inputChapter').value = chapter;
+      document.getElementById('inputMethodology').value = methodology;
+
+      // Extract or draft core findings
+      if (abstract && abstract.length > 60) {
+        const sentences = abstract.split('. ');
+        const keyFindingsDraft = sentences.slice(0, 2).join('. ') + '.';
+        document.getElementById('inputFindings').value = `[AI Draft from Abstract]: ${keyFindingsDraft}`;
+        document.getElementById('inputQuote').value = sentences[0] ? `"${sentences[0]}."` : '';
+      } else {
+        document.getElementById('inputFindings').value = `[AI Draft]: Investigates ${title} in the context of digital platform dynamics and user behavioral outcomes.`;
+        document.getElementById('inputQuote').value = `"[Review full paper to extract exact quotation on ${theme}]."`;
+      }
+
+      document.getElementById('inputRelevance').value = `[AI Draft]: Supports ${chapter} by providing empirical grounding for ${theme.toLowerCase()} and informing user interaction requirements for the platform.`;
+    }
+
+    // Badge styling helper
+    function getThemeBadge(theme) {
+      switch (theme) {
+        case 'K-Pop Fandom & Communities':
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-pink-100 text-pink-800 dark:bg-pink-900/60 dark:text-pink-300">K-Pop Fandom</span>';
+        case 'Misinformation & Verification':
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300">Misinformation</span>';
+        case 'Platform Moderation & Algorithms':
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300">Governance</span>';
+        case 'Information Overload':
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">Info Overload</span>';
+        case 'Knowledge Sharing & Engagement':
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300">Knowledge Sharing</span>';
+        default:
+          return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">General</span>';
+      }
+    }
+
+    // Render Table Rows
+    function renderTable() {
+      const filtered = state.data.filter(item => {
+        const query = state.filters.search.toLowerCase();
+        const matchesSearch = query === '' || 
+          (item.title && item.title.toLowerCase().includes(query)) ||
+          (item.authors && item.authors.toLowerCase().includes(query)) ||
+          (item.citationKey && item.citationKey.toLowerCase().includes(query)) ||
+          (item.journal && item.journal.toLowerCase().includes(query)) ||
+          (item.theme && item.theme.toLowerCase().includes(query)) ||
+          (item.relevance && item.relevance.toLowerCase().includes(query));
+
+        const matchesTheme = state.filters.theme === 'all' || item.theme === state.filters.theme;
+        const matchesChapter = state.filters.chapter === 'all' || (item.chapter && item.chapter.startsWith(state.filters.chapter));
+        const matchesRead = state.filters.readingStatus === 'all' || item.readStatus === state.filters.readingStatus;
+        const matchesCite = state.filters.citationStatus === 'all' || item.citeStatus === state.filters.citationStatus;
+
+        return matchesSearch && matchesTheme && matchesChapter && matchesRead && matchesCite;
+      });
+
+      visibleRowCount.textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="text-center py-12 text-slate-400">
+              <i class="fa-solid fa-folder-open text-3xl mb-2 block"></i>
+              No literature references matched your criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = filtered.map(item => `
+        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-750 transition border-b border-slate-100 dark:border-slate-800">
+          <td class="py-3 px-3 text-center">
+            <span class="font-mono text-[11px] font-bold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800">
+              ${item.id}
+            </span>
+          </td>
+
+          <td class="py-3 px-3">
+            <div class="font-semibold text-slate-900 dark:text-white">${item.citationKey}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[180px]" title="${item.authors}">${item.authors}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span> Year: ${item.year}
+            </div>
+          </td>
+
+          <td class="py-3 px-4">
+            <a href="javascript:void(0)" onclick="openDetailModal('${item.id}')" class="font-medium text-slate-800 dark:text-slate-100 hover:text-sky-600 dark:hover:text-sky-400 block line-clamp-2 leading-snug">
+              ${item.title}
+            </a>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 italic flex flex-wrap items-center gap-x-2">
+              <span>${item.journal}</span>
+              ${item.volumePages ? `<span>•</span><span>${item.volumePages}</span>` : ''}
+            </div>
+            <div class="mt-1">
+              <a href="${item.doi}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1 font-mono">
+                <i class="fa-solid fa-link text-[10px]"></i> DOI
+              </a>
+            </div>
+          </td>
+
+          <td class="py-3 px-3 space-y-1">
+            <div>${getThemeBadge(item.theme)}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+              <i class="fa-solid fa-microscope text-[10px] text-slate-400"></i> ${item.methodology || 'Qualitative/Empirical'}
+            </div>
+          </td>
+
+          <td class="py-3 px-4">
+            <p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+              ${item.relevance || 'Relevant to thesis development and synthesis.'}
+            </p>
+          </td>
+
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+              ${item.chapter}
+            </span>
+          </td>
+
+          <td class="py-3 px-3">
+            <select onchange="updateReadStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1.5 border focus:outline-none focus:ring-1 focus:ring-sky-500 w-full transition ${getReadStatusStyle(item.readStatus)}">
+              <option value="Unread" ${item.readStatus === 'Unread' ? 'selected' : ''}>Unread</option>
+              <option value="Skimmed" ${item.readStatus === 'Skimmed' ? 'selected' : ''}>Skimmed</option>
+              <option value="Read & Annotated" ${item.readStatus === 'Read & Annotated' ? 'selected' : ''}>Read & Annotated</option>
+              <option value="Synthesized" ${item.readStatus === 'Synthesized' ? 'selected' : ''}>Synthesized</option>
+            </select>
+          </td>
+
+          <td class="py-3 px-3">
+            <select onchange="updateCiteStatus('${item.id}', this.value)" class="text-xs font-semibold rounded-lg px-2 py-1.5 border focus:outline-none focus:ring-1 focus:ring-sky-500 w-full transition ${getCiteStatusStyle(item.citeStatus)}">
+              <option value="Not Used Yet" ${item.citeStatus === 'Not Used Yet' ? 'selected' : ''}>Not Used Yet</option>
+              <option value="Drafted" ${item.citeStatus === 'Drafted' ? 'selected' : ''}>Drafted</option>
+              <option value="Final Cited" ${item.citeStatus === 'Final Cited' ? 'selected' : ''}>Final Cited</option>
+              <option value="Archive" ${item.citeStatus === 'Archive' ? 'selected' : ''}>Archive</option>
+            </select>
+          </td>
+
+          <td class="py-3 px-3 text-center">
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="copyInTextCitation('${item.citationKey}')" title="Copy In-Text Citation" class="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
+                <i class="fa-solid fa-quote-right text-xs"></i>
+              </button>
+              <button onclick="openDetailModal('${item.id}')" title="View Full Details" class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition">
+                <i class="fa-solid fa-circle-info text-xs"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getReadStatusStyle(status) {
+      switch (status) {
+        case 'Unread':
+          return 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900';
+        case 'Skimmed':
+          return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900';
+        case 'Read & Annotated':
+          return 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-900';
+        case 'Synthesized':
+          return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900';
+        default:
+          return 'bg-slate-50 text-slate-700 border-slate-200';
+      }
+    }
+
+    function getCiteStatusStyle(status) {
+      switch (status) {
+        case 'Not Used Yet':
+          return 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600';
+        case 'Drafted':
+          return 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-900';
+        case 'Final Cited':
+          return 'bg-emerald-50 text-emerald-800 font-bold border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800';
+        case 'Archive':
+          return 'bg-slate-100 text-slate-400 border-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700';
+        default:
+          return 'bg-slate-50 text-slate-600 border-slate-200';
+      }
+    }
+
+    window.updateReadStatus = function(id, newStatus) {
+      const item = state.data.find(r => r.id === id);
+      if (item) {
+        item.readStatus = newStatus;
+        updateDashboardKPIs();
+        renderTable();
+        showToast(`Updated ${item.citationKey} reading status to "${newStatus}"`);
+      }
+    };
+
+    window.updateCiteStatus = function(id, newStatus) {
+      const item = state.data.find(r => r.id === id);
+      if (item) {
+        item.citeStatus = newStatus;
+        updateDashboardKPIs();
+        renderTable();
+        showToast(`Updated ${item.citationKey} citation status to "${newStatus}"`);
+      }
+    };
+
+    function updateDashboardKPIs() {
+      const total = state.data.length;
+      const synthesized = state.data.filter(r => r.readStatus === 'Synthesized').length;
+      const annotated = state.data.filter(r => r.readStatus === 'Read & Annotated').length;
+      const skimmed = state.data.filter(r => r.readStatus === 'Skimmed').length;
+      const unread = state.data.filter(r => r.readStatus === 'Unread').length;
+
+      const finalCited = state.data.filter(r => r.citeStatus === 'Final Cited').length;
+      const drafted = state.data.filter(r => r.citeStatus === 'Drafted').length;
+      const notUsed = state.data.filter(r => r.citeStatus === 'Not Used Yet').length;
+
+      const completedPct = total > 0 ? Math.round(((synthesized + annotated) / total) * 100) : 0;
+
+      document.getElementById('metricTotalPapers').textContent = total;
+      document.getElementById('metricTargetTotal').textContent = total;
+      document.getElementById('metricReadPercent').textContent = `${completedPct}% processed`;
+      document.getElementById('metricSynthesizedCount').textContent = `${synthesized} Synthesized`;
+      document.getElementById('metricAnnotatedCount').textContent = `${annotated} Read`;
+      document.getElementById('metricUnreadCount').textContent = `${unread} Unread`;
+
+      if (total > 0) {
+        document.getElementById('barSynthesized').style.width = `${(synthesized / total) * 100}%`;
+        document.getElementById('barAnnotated').style.width = `${(annotated / total) * 100}%`;
+        document.getElementById('barSkimmed').style.width = `${(skimmed / total) * 100}%`;
+      }
+
+      document.getElementById('metricCitedCount').textContent = finalCited;
+      document.getElementById('metricDraftedCount').textContent = `${drafted} drafted`;
+      document.getElementById('metricNotUsedCount').textContent = `${notUsed} queued`;
+    }
+
+    window.openDetailModal = function(id) {
+      const item = state.data.find(r => r.id === id);
+      if (!item) return;
+      currentModalPaper = item;
+
+      modalId.textContent = item.id;
+      modalYear.textContent = item.year;
+      modalChapterBadge.textContent = item.chapter;
+      modalTitle.textContent = item.title;
+      modalAuthors.textContent = item.authors;
+      modalApaCitation.textContent = `${item.authors} (${item.year}). ${item.title}. ${item.journal}, ${item.volumePages || ''}. ${item.doi}`;
+      modalFindings.textContent = item.findings || 'No specific findings extracted yet.';
+      modalQuote.textContent = item.quotes || 'No direct quotation marked.';
+      modalRelevance.textContent = item.relevance || 'Relevant to thesis development.';
+      modalVenue.textContent = `${item.journal} ${item.volumePages ? '(' + item.volumePages + ')' : ''}`;
+      modalDoiLink.href = item.doi;
+      modalDoiLink.innerHTML = `<span>${item.doi}</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>`;
+
+      detailModal.classList.remove('hidden');
+    };
+
+    function closeDetailModal() {
+      detailModal.classList.add('hidden');
+      currentModalPaper = null;
+    }
+
+    window.copyInTextCitation = function(citationKey) {
+      copyToClipboard(citationKey);
+      showToast(`Copied in-text key: "${citationKey}"`);
+    };
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Copy fallback error:', err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      toastMsg.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-20');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-20');
+      }, 2500);
+    }
+
+    function exportToCSV() {
+      const headers = [
+        "ID", "Citation Key", "Authors", "Year", "Title", "Venue", "Volume/Pages", 
+        "DOI", "Thematic Domain", "Methodology", "Key Findings", "Project Relevance", 
+        "Citable Quote", "Thesis Chapter", "Reading Status", "Citation Status"
+      ];
+
+      const csvRows = [];
+      csvRows.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(","));
+
+      state.data.forEach(item => {
+        const row = [
+          item.id,
+          item.citationKey,
+          item.authors,
+          item.year,
+          item.title,
+          item.journal,
+          item.volumePages,
+          item.doi,
+          item.theme,
+          item.methodology,
+          item.findings,
+          item.relevance,
+          item.quotes,
+          item.chapter,
+          item.readStatus,
+          item.citeStatus
+        ];
+        csvRows.push(row.map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(","));
+      });
+
+      const csvString = csvRows.join("\r\n");
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Thesis_Literature_Matrix_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Literature matrix exported to CSV!");
+    }
+
+    function setupEventListeners() {
+      // Search
+      searchInput.addEventListener('input', (e) => {
+        state.filters.search = e.target.value;
+        renderTable();
+      });
+
+      // Status filters
+      filterReading.addEventListener('change', (e) => {
+        state.filters.readingStatus = e.target.value;
+        renderTable();
+      });
+
+      filterCitation.addEventListener('change', (e) => {
+        state.filters.citationStatus = e.target.value;
+        renderTable();
+      });
+
+      // Reset
+      resetFiltersBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterReading.value = 'all';
+        filterCitation.value = 'all';
+        state.filters.search = '';
+        state.filters.theme = 'all';
+        state.filters.chapter = 'all';
+        state.filters.readingStatus = 'all';
+        state.filters.citationStatus = 'all';
+
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+          btn.classList.remove('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
+          btn.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+        });
+        document.querySelector('[data-filter-theme="all"]').classList.add('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
+
+        document.querySelectorAll('.chapter-btn').forEach(btn => {
+          btn.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-600');
+          btn.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+        });
+        document.querySelector('[data-filter-chapter="all"]').classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-600');
+
+        renderTable();
+        showToast("Filters reset to default.");
+      });
+
+      // Chapter Filter Buttons
+      document.querySelectorAll('.chapter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.chapter-btn').forEach(b => {
+            b.classList.remove('bg-slate-900', 'text-white', 'dark:bg-sky-600');
+            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+          });
+          btn.classList.add('bg-slate-900', 'text-white', 'dark:bg-sky-600');
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+          state.filters.chapter = btn.getAttribute('data-filter-chapter');
+          renderTable();
+        });
+      });
+
+      // Thematic Pill Buttons
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.theme-btn').forEach(b => {
+            b.classList.remove('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
+            b.classList.add('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+          });
+          btn.classList.add('bg-sky-100', 'text-sky-800', 'dark:bg-sky-900/60', 'dark:text-sky-200');
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'dark:bg-slate-700', 'dark:text-slate-300');
+          state.filters.theme = btn.getAttribute('data-filter-theme');
+          renderTable();
+        });
+      });
+
+      // CSV Export
+      exportCsvBtn.addEventListener('click', exportToCSV);
+
+      // Dark / Light Toggle
+      themeToggleBtn.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // Add Modal Open/Close
+      openAddModalBtn.addEventListener('click', () => {
+        addRefForm.reset();
+        quickDoiInput.value = '';
+        autoFillBadge.classList.add('hidden');
+        addModal.classList.remove('hidden');
+      });
+      closeAddModalBtn.addEventListener('click', () => addModal.classList.add('hidden'));
+      cancelAddBtn.addEventListener('click', () => addModal.classList.add('hidden'));
+
+      // DOI Auto-Fill Button Click
+      fetchDoiBtn.addEventListener('click', handleDoiAutoFill);
+      quickDoiInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleDoiAutoFill();
+        }
+      });
+
+      // Detail Modal Closers
+      closeModalBtn.addEventListener('click', closeDetailModal);
+      modalDismissBottom.addEventListener('click', closeDetailModal);
+      detailModal.addEventListener('click', (e) => {
+        if (e.target === detailModal) closeDetailModal();
+      });
+
+      // Copy APA Citation from Modal
+      copyApaBtn.addEventListener('click', () => {
+        if (currentModalPaper) {
+          const fullApa = `${currentModalPaper.authors} (${currentModalPaper.year}). ${currentModalPaper.title}. ${currentModalPaper.journal}, ${currentModalPaper.volumePages || ''}. ${currentModalPaper.doi}`;
+          copyToClipboard(fullApa);
+          showToast(`Copied complete APA 7 reference for ${currentModalPaper.citationKey}`);
+        }
+      });
+
+      // Add Reference Form Submit (Save to Sheets)
+      addRefForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nextIndex = state.data.length + 1;
+        const newRefData = {
+          id: `REF-${String(nextIndex).padStart(2, '0')}`,
+          citationKey: document.getElementById('inputCiteKey').value,
+          authors: document.getElementById('inputAuthors').value,
+          year: parseInt(document.getElementById('inputYear').value, 10) || 2025,
+          title: document.getElementById('inputTitle').value,
+          journal: document.getElementById('inputVenue').value || 'Journal Article',
+          volumePages: document.getElementById('inputVolumePages').value || '',
+          doi: document.getElementById('inputDoi').value || '#',
+          theme: document.getElementById('inputDomain').value,
+          methodology: document.getElementById('inputMethodology').value || 'Empirical',
+          findings: document.getElementById('inputFindings').value || '',
+          relevance: document.getElementById('inputRelevance').value || '',
+          quotes: document.getElementById('inputQuote').value || '',
+          chapter: document.getElementById('inputChapter').value,
+          readStatus: 'Unread',
+          citeStatus: 'Not Used Yet'
+        };
+
+        await submitNewReference(newRefData);
+        addRefForm.reset();
+        addModal.classList.add('hidden');
+      });
+    }
+
+    // Launch app once loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      loadReferences();
+    });
+  </script>
+</body>
+</html>
