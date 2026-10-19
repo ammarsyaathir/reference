@@ -836,144 +836,177 @@
       }
     }
 
-    // ==========================================
-    // DOI AUTO-FILL & AI SYNTHESIS ENGINE
-    // ==========================================
-    async function handleDoiAutoFill() {
-      let rawInput = quickDoiInput.value.trim();
-      if (!rawInput) {
-        alert("Please paste a DOI link or identifier (e.g. 10.1177/01655515221121942)");
-        return;
+ // Updated handleDoiAutoFill with safe element checks and robust fallback parsing
+async function handleDoiAutoFill() {
+  const quickDoiInput = document.getElementById('quickDoiInput');
+  const fetchBtnText = document.getElementById('fetchBtnText');
+  const fetchSpinner = document.getElementById('fetchSpinner');
+  const fetchDoiBtn = document.getElementById('fetchDoiBtn');
+  const autoFillBadge = document.getElementById('autoFillBadge');
+
+  let rawInput = quickDoiInput ? quickDoiInput.value.trim() : '';
+  if (!rawInput) {
+    alert("Please enter a valid DOI link or identifier (e.g., 10.1177/01655515221121942).");
+    return;
+  }
+
+  // Extract clean DOI identifier
+  const doiPattern = /(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/;
+  const match = rawInput.match(doiPattern);
+  const cleanDoi = match ? match[1] : rawInput;
+
+  if (fetchBtnText) fetchBtnText.classList.add('hidden');
+  if (fetchSpinner) fetchSpinner.classList.remove('hidden');
+  if (fetchDoiBtn) fetchDoiBtn.disabled = true;
+
+  try {
+    // 1. Fetch metadata from CrossRef
+    const crRes = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
+    if (!crRes.ok) throw new Error("CrossRef lookup failed. Check DOI identifier.");
+    const crJson = await crRes.json();
+    const crData = crJson.message;
+
+    // 2. Fetch Abstract & TLDR (Check Semantic Scholar first, then fallback to CrossRef abstract)
+    let paperAbstract = "";
+    let paperTldr = "";
+
+    try {
+      const s2Res = await fetch(`https://api.semanticscholar.org/graph/v1/paper/DOI:${encodeURIComponent(cleanDoi)}?fields=abstract,tldr`);
+      if (s2Res.ok) {
+        const s2Data = await s2Res.json();
+        paperAbstract = s2Data.abstract || "";
+        paperTldr = s2Data.tldr?.text || "";
       }
-
-      // Clean input into pure DOI format: 10.xxxx/...
-      const doiPattern = /(10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+)/;
-      const match = rawInput.match(doiPattern);
-      const cleanDoi = match ? match[1] : rawInput;
-
-      // Update UI loading state
-      fetchBtnText.classList.add('hidden');
-      fetchSpinner.classList.remove('hidden');
-      fetchDoiBtn.disabled = true;
-
-      try {
-        // Query open CrossRef Scholarly Metadata API
-        const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(cleanDoi)}`);
-        if (!response.ok) throw new Error("Could not find article via CrossRef");
-        
-        const json = await response.json();
-        const data = json.message;
-
-        // 1. Authors Extraction
-        let authorsList = "Unknown Authors";
-        let firstAuthorLastName = "Author";
-        if (data.author && data.author.length > 0) {
-          firstAuthorLastName = data.author[0].family || "Author";
-          if (data.author.length === 1) {
-            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}.`;
-          } else if (data.author.length === 2) {
-            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}., & ${data.author[1].family || ''}, ${(data.author[1].given || '')[0] || ''}.`;
-          } else {
-            authorsList = `${data.author[0].family || ''}, ${(data.author[0].given || '')[0] || ''}., ${data.author[1].family || ''}, ${(data.author[1].given || '')[0] || ''}., et al.`;
-          }
-        }
-
-        // 2. Publication Year
-        let pubYear = 2025;
-        if (data["published-print"] && data["published-print"]["date-parts"]) {
-          pubYear = data["published-print"]["date-parts"][0][0];
-        } else if (data["published-online"] && data["published-online"]["date-parts"]) {
-          pubYear = data["published-online"]["date-parts"][0][0];
-        } else if (data.created && data.created["date-parts"]) {
-          pubYear = data.created["date-parts"][0][0];
-        }
-
-        // 3. Title, Venue, Volume & Pages
-        const articleTitle = data.title && data.title[0] ? data.title[0] : "Untitled Article";
-        const journalName = data["container-title"] && data["container-title"][0] ? data["container-title"][0] : (data.publisher || "Scholarly Publication");
-        const volume = data.volume ? `Vol. ${data.volume}` : '';
-        const issue = data.issue ? `No. ${data.issue}` : '';
-        const page = data.page ? `pp. ${data.page}` : (data.article_number ? `Article ${data.article_number}` : '');
-        const volumePages = [volume, issue, page].filter(Boolean).join(', ');
-
-        // 4. In-Text Citation Key Generator
-        const citeCount = data.author && data.author.length > 2 ? `${firstAuthorLastName} et al. (${pubYear})` : `${firstAuthorLastName} (${pubYear})`;
-
-        // 5. Populate Form Fields
-        document.getElementById('inputCiteKey').value = citeCount;
-        document.getElementById('inputAuthors').value = authorsList;
-        document.getElementById('inputYear').value = pubYear;
-        document.getElementById('inputTitle').value = articleTitle;
-        document.getElementById('inputVenue').value = journalName;
-        document.getElementById('inputVolumePages').value = volumePages;
-        document.getElementById('inputDoi').value = `https://doi.org/${cleanDoi}`;
-
-        // 6. AI Contextual Synthesis & Relevance Drafter
-        const abstractText = data.abstract ? data.abstract.replace(/<[^>]*>?/gm, '') : '';
-        autoDraftAISynthesis(articleTitle, abstractText, journalName);
-
-        // Show Success Badge
-        autoFillBadge.classList.remove('hidden');
-        showToast("Auto-filled details via DOI! Please review drafted text.");
-      } catch (err) {
-        console.error("DOI Lookup error:", err);
-        alert("Failed to retrieve publication via DOI. Please verify the DOI string or fill the fields manually.");
-      } finally {
-        fetchBtnText.classList.remove('hidden');
-        fetchSpinner.classList.add('hidden');
-        fetchDoiBtn.disabled = false;
-      }
+    } catch (e) {
+      console.warn("Semantic Scholar fallback skipped:", e);
     }
 
-    // AI Contextual Synthesis Drafter based on title and abstract heuristics
-    function autoDraftAISynthesis(title, abstract, venue) {
-      const lowerText = `${title} ${abstract} ${venue}`.toLowerCase();
-      
-      let theme = "Knowledge Sharing & Engagement";
-      let chapter = "Chapter 2 (Literature Review)";
-      let methodology = "Empirical / User Study";
-
-      if (lowerText.includes("misinformation") || lowerText.includes("fake news") || lowerText.includes("credibility") || lowerText.includes("verification")) {
-        theme = "Misinformation & Verification";
-        chapter = lowerText.includes("framework") || lowerText.includes("system") ? "Chapter 3 (System Framework)" : "Chapter 1 (Problem Statement)";
-      } else if (lowerText.includes("k-pop") || lowerText.includes("fandom") || lowerText.includes("fan") || lowerText.includes("community")) {
-        theme = "K-Pop Fandom & Communities";
-        chapter = "Chapter 2 (Literature Review)";
-      } else if (lowerText.includes("overload") || lowerText.includes("fatigue") || lowerText.includes("exhaustion")) {
-        theme = "Information Overload";
-        chapter = "Chapter 1 (Problem Statement)";
-      } else if (lowerText.includes("moderation") || lowerText.includes("algorithm") || lowerText.includes("governance") || lowerText.includes("policy")) {
-        theme = "Platform Moderation & Algorithms";
-        chapter = "Chapter 3 (System Framework)";
-      }
-
-      if (lowerText.includes("survey") || lowerText.includes("questionnaire") || lowerText.includes("pls-sem") || lowerText.includes("sem")) {
-        methodology = "Quantitative Survey (PLS-SEM)";
-      } else if (lowerText.includes("interview") || lowerText.includes("qualitative") || lowerText.includes("thematic")) {
-        methodology = "Qualitative Thematic Analysis";
-      } else if (lowerText.includes("review") || lowerText.includes("meta-analysis")) {
-        methodology = "Systematic Literature Review";
-      }
-
-      document.getElementById('inputDomain').value = theme;
-      document.getElementById('inputChapter').value = chapter;
-      document.getElementById('inputMethodology').value = methodology;
-
-      // Extract or draft core findings
-      if (abstract && abstract.length > 60) {
-        const sentences = abstract.split('. ');
-        const keyFindingsDraft = sentences.slice(0, 2).join('. ') + '.';
-        document.getElementById('inputFindings').value = `[AI Draft from Abstract]: ${keyFindingsDraft}`;
-        document.getElementById('inputQuote').value = sentences[0] ? `"${sentences[0]}."` : '';
-      } else {
-        document.getElementById('inputFindings').value = `[AI Draft]: Investigates ${title} in the context of digital platform dynamics and user behavioral outcomes.`;
-        document.getElementById('inputQuote').value = `"[Review full paper to extract exact quotation on ${theme}]."`;
-      }
-
-      document.getElementById('inputRelevance').value = `[AI Draft]: Supports ${chapter} by providing empirical grounding for ${theme.toLowerCase()} and informing user interaction requirements for the platform.`;
+    // If Semantic Scholar had no abstract, check if CrossRef has an embedded JATS abstract
+    if (!paperAbstract && crData.abstract) {
+      paperAbstract = crData.abstract.replace(/<[^>]*>?/gm, '').trim();
     }
 
-    // Badge styling helper
+    // 3. Authors & Citation Key (Handles single, multi, and corporate authors)
+    let authorsList = "Unknown Authors";
+    let firstAuthor = "Author";
+
+    if (Array.isArray(crData.author) && crData.author.length > 0) {
+      firstAuthor = crData.author[0].family || crData.author[0].name || "Author";
+      authorsList = crData.author.map(a => {
+        if (a.name) return a.name; // Corporate author
+        const family = a.family || '';
+        const initial = a.given ? `${a.given.trim()[0]}.` : '';
+        return [family, initial].filter(Boolean).join(', ');
+      }).join(', ');
+    }
+
+    // Date extraction
+    const pubYear = crData["published-print"]?.["date-parts"]?.[0]?.[0] || 
+                    crData["published-online"]?.["date-parts"]?.[0]?.[0] || 
+                    crData["created"]?.["date-parts"]?.[0]?.[0] || 2025;
+
+    const citeKey = crData.author && crData.author.length > 2 
+      ? `${firstAuthor} et al. (${pubYear})` 
+      : `${firstAuthor} (${pubYear})`;
+
+    // Helper: Safely populate input by ID only if element exists
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    };
+
+    setVal('inputCiteKey', citeKey);
+    setVal('inputAuthors', authorsList);
+    setVal('inputYear', pubYear);
+    setVal('inputTitle', crData.title?.[0] || "Untitled Article");
+    setVal('inputVenue', crData["container-title"]?.[0] || crData.publisher || "");
+    
+    const vol = crData.volume ? `Vol. ${crData.volume}` : '';
+    const iss = crData.issue ? `No. ${crData.issue}` : '';
+    const pg = crData.page ? `pp. ${crData.page}` : (crData.article_number ? `Art. ${crData.article_number}` : '');
+    setVal('inputVolumePages', [vol, iss, pg].filter(Boolean).join(', '));
+    setVal('inputDoi', `https://doi.org/${cleanDoi}`);
+
+    // 4. Draft Claims, Methodology, Relevance, and Notes
+    extractAcademicSynthesis(crData.title?.[0] || "", paperAbstract || paperTldr);
+
+    if (autoFillBadge) autoFillBadge.classList.remove('hidden');
+    if (typeof showToast === 'function') {
+      showToast("Parsed metadata and drafted claims! Review before saving.");
+    }
+  } catch (err) {
+    console.error("DOI Lookup error:", err);
+    alert("Could not extract paper data. Please verify the DOI or fill the fields manually.");
+  } finally {
+    if (fetchBtnText) fetchBtnText.classList.remove('hidden');
+    if (fetchSpinner) fetchSpinner.classList.add('hidden');
+    if (fetchDoiBtn) fetchDoiBtn.disabled = false;
+  }
+}
+
+// Safe heuristic extractor with null-guards for all form elements
+function extractAcademicSynthesis(title, text) {
+  const cleanText = (text || '').replace(/<[^>]*>?/gm, '').trim();
+  const content = `${title} ${cleanText}`.toLowerCase();
+
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+
+  // Determine Methodology
+  let method = "Empirical / Mixed Methods";
+  if (content.includes("survey") || content.includes("pls-sem") || content.includes("questionnaire")) {
+    method = "Quantitative Survey (PLS-SEM / Regression)";
+  } else if (content.includes("interview") || content.includes("qualitative") || content.includes("case study")) {
+    method = "Qualitative Case Study / Thematic Analysis";
+  } else if (content.includes("systematic review") || content.includes("meta-analysis")) {
+    method = "Systematic Literature Review";
+  }
+  setVal('inputMethodology', method);
+
+  // Extract Citable Claim / Quote safely without regex lookbehind
+  if (cleanText.length > 80) {
+    // Cross-browser safe sentence splitting
+    const rawSentences = cleanText.split(/[.?!]\s+/).map(s => s.trim()).filter(Boolean);
+    const keySentence = rawSentences.length > 2 
+      ? rawSentences[rawSentences.length - 2] 
+      : rawSentences[0];
+
+    setVal('inputFindings', keySentence ? `${keySentence}.` : cleanText.slice(0, 150));
+    setVal('inputQuote', keySentence ? `"${keySentence}."` : `"${cleanText.slice(0, 100)}..."`);
+    
+    // Methodological Limitations
+    if (method.includes("Quantitative")) {
+      setVal('inputNotes', "Cross-sectional survey data; relies on self-reported perceptions rather than system logs. Sample limited to specific platform demographics.");
+    } else if (method.includes("Qualitative")) {
+      setVal('inputNotes', "Sample size limits statistical generalizability; findings reflect localized community context.");
+    } else {
+      setVal('inputNotes', "Theoretical scope bounded by platform-specific API policies and historical data availability.");
+    }
+  } else {
+    setVal('inputFindings', `Analyzes ${title} and its implications for user behavior and digital platform governance.`);
+    setVal('inputQuote', `"[Extract direct quotation from Introduction or Discussion section]."`);
+    setVal('inputNotes', "Verify methodology section for sample constraints, geographical boundaries, or temporal limitations.");
+  }
+
+  // Thesis Relevance & Chapter Mapping
+  if (content.includes("misinformation") || content.includes("verification") || content.includes("credibility")) {
+    setVal('inputDomain', "Misinformation & Verification");
+    setVal('inputChapter', "Chapter 3 (System Framework)");
+    setVal('inputRelevance', "Validates the necessity of verification badges, authenticity checks, and provenance tracking in the platform architecture.");
+  } else if (content.includes("fandom") || content.includes("k-pop") || content.includes("community")) {
+    setVal('inputDomain', "K-Pop Fandom & Communities");
+    setVal('inputChapter', "Chapter 2 (Literature Review)");
+    setVal('inputRelevance', "Establishes contextual grounding on fan mobilization, event coordination, and digital trust dynamics in fan communities.");
+  } else {
+    setVal('inputDomain', "Information Overload");
+    setVal('inputChapter', "Chapter 1 (Problem Statement)");
+    setVal('inputRelevance', "Provides empirical justification for consolidating fragmented social channels into a single centralized dashboard.");
+  }
+}
+
+   // Badge styling helper
     function getThemeBadge(theme) {
       switch (theme) {
         case 'K-Pop Fandom & Communities':
